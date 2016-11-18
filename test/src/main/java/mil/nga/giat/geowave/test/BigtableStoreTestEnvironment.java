@@ -55,21 +55,27 @@ public class BigtableStoreTestEnvironment extends
 
 		try {
 			Process p = pb.start();
-
-			BufferedReader br = new BufferedReader(
-					new InputStreamReader(
-							p.getInputStream(),
-							StandardCharsets.UTF_8));
-
-			String line;
-			while ((line = br.readLine()) != null) {
-				LOGGER.warn(line);
-			}
-			LOGGER.warn("gcloud emulator setup complete!");
-
-			br.close();
+			p.waitFor();
 		}
 		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		pb.command("source", "exportBigtableEnv");
+		try {
+			Process p = pb.start();
+			p.waitFor();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
