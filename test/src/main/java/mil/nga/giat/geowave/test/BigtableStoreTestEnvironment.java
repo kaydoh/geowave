@@ -1,9 +1,7 @@
 package mil.nga.giat.geowave.test;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.log4j.Logger;
 
@@ -51,7 +49,9 @@ public class BigtableStoreTestEnvironment extends
 				"gcloud-init.sh");
 
 		String processDir = System.getProperty("user.dir");
-		LOGGER.warn("Running gcloud install in " + processDir);	
+		LOGGER.warn("KAM >>> Running gcloud install in " + processDir);
+		
+		pb.directory(new File(processDir));
 
 		try {
 			Process p = pb.start();
@@ -79,6 +79,8 @@ public class BigtableStoreTestEnvironment extends
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		LOGGER.warn("KAM >>> GCLOUD SETUP COMPLETE");
 	}
 
 	@Override
