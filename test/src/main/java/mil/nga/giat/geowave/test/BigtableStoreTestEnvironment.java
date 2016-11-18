@@ -3,6 +3,7 @@ package mil.nga.giat.geowave.test;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.log4j.Logger;
 
@@ -46,20 +47,27 @@ public class BigtableStoreTestEnvironment extends
 
 	@Override
 	public void setup() {
-		ProcessBuilder pb = new ProcessBuilder("gcloud-init.sh");
-		
-		LOGGER.warn("Running gcloud install in " + pb.directory());
-		
+		ProcessBuilder pb = new ProcessBuilder(
+				"gcloud-init.sh");
+
+		String processDir = System.getProperty("user.dir");
+		LOGGER.warn("Running gcloud install in " + processDir);	
+
 		try {
 			Process p = pb.start();
-			
-		    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		    
-		    String line;
-		    while ((line = br.readLine()) != null) {
-		      LOGGER.warn(line);
-		    }
-		    LOGGER.warn("gcloud emulator setup complete!");
+
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(
+							p.getInputStream(),
+							StandardCharsets.UTF_8));
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				LOGGER.warn(line);
+			}
+			LOGGER.warn("gcloud emulator setup complete!");
+
+			br.close();
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -68,8 +76,7 @@ public class BigtableStoreTestEnvironment extends
 	}
 
 	@Override
-	public void tearDown() {
-	}
+	public void tearDown() {}
 
 	@Override
 	public TestEnvironment[] getDependentEnvironments() {
