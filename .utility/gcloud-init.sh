@@ -15,13 +15,13 @@
 # EOF
 
 # start the emulator
-/usr/bin/gcloud beta emulators bigtable start &
+sudo /usr/bin/gcloud beta emulators bigtable start &
 
 # wait a few seconds
 sleep 10
 
 # get the emulator port and set it in the env
-/usr/bin/gcloud beta emulators bigtable env-init > exportBigtableEnv
+sudo /usr/bin/gcloud beta emulators bigtable env-init > exportBigtableEnv
 
 # this next step has to be run outside this script:
 # source exportBigtableEnv
