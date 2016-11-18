@@ -6,13 +6,13 @@
 # rm google-cloud-sdk-135.0.0-linux-x86_64.tar
 
 # install the beta component & emulator
-# cat <<EOF | ./google-cloud-sdk/bin/gcloud components install beta
-# Y
-# EOF
+cat <<EOF | sudo /usr/bin/gcloud components install beta
+Y
+EOF
 
-# cat <<EOF | ./google-cloud-sdk/bin/gcloud beta emulators bigtable env-init --quiet
-# Y
-# EOF
+cat <<EOF | sudo /usr/bin/gcloud beta emulators bigtable env-init --quiet
+Y
+EOF
 
 # start the emulator
 sudo /usr/bin/gcloud beta emulators bigtable start &
