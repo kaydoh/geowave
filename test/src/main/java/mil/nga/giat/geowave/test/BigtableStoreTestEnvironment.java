@@ -45,13 +45,11 @@ public class BigtableStoreTestEnvironment extends
 
 	@Override
 	public void setup() {
-		ProcessBuilder pb = new ProcessBuilder(
-				"gcloud-init.sh");
-
 		String processDir = System.getProperty("user.dir");
 		LOGGER.warn("KAM >>> Running gcloud install in " + processDir);
-		
-		pb.directory(new File(processDir));
+
+		ProcessBuilder pb = new ProcessBuilder(
+				processDir+"/gcloud-init.sh");
 
 		try {
 			Process p = pb.start();
