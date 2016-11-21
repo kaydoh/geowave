@@ -50,10 +50,15 @@ public class BigtableStoreTestEnvironment extends
 
 	@Override
 	public void setup() {
+		
 		String processDir = System.getProperty(
 				"user.dir");
 		LOGGER.warn(
 				"KAM >>> Running gcloud install in " + processDir);
+				
+		String chmodIt = "/bin/bash -c chmod 755 " + processDir + "/gcloud-init.sh";
+		String chmodOut = executeCommand(chmodIt);
+		LOGGER.warn(chmodOut);
 
 		String cmdOut = executeCommand(processDir + "/gcloud-init.sh");
 		LOGGER.warn(cmdOut);
