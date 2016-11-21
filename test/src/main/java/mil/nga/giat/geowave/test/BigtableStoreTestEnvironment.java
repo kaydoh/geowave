@@ -1,7 +1,8 @@
 package mil.nga.giat.geowave.test;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
@@ -25,7 +26,8 @@ public class BigtableStoreTestEnvironment extends
 		return singletonInstance;
 	}
 
-	private final static Logger LOGGER = Logger.getLogger(BigtableStoreTestEnvironment.class);
+	private final static Logger LOGGER = Logger.getLogger(
+			BigtableStoreTestEnvironment.class);
 
 	private BigtableStoreTestEnvironment() {}
 
@@ -33,9 +35,12 @@ public class BigtableStoreTestEnvironment extends
 	protected void initOptions(
 			final StoreFactoryOptions options ) {
 		HBaseOptions hbaseOptions = ((HBaseRequiredOptions) options).getAdditionalOptions();
-		hbaseOptions.setBigtable(true);
-		hbaseOptions.setEnableCustomFilters(false);
-		hbaseOptions.setEnableCoprocessors(false);
+		hbaseOptions.setBigtable(
+				true);
+		hbaseOptions.setEnableCustomFilters(
+				false);
+		hbaseOptions.setEnableCoprocessors(
+				false);
 	}
 
 	@Override
@@ -45,11 +50,59 @@ public class BigtableStoreTestEnvironment extends
 
 	@Override
 	public void setup() {
-		String processDir = System.getProperty("user.dir");
-		LOGGER.warn("KAM >>> Running gcloud install in " + processDir);
+		String processDir = System.getProperty(
+				"user.dir");
+		LOGGER.warn(
+				"KAM >>> Running gcloud install in " + processDir);
 
-		ProcessBuilder pb = new ProcessBuilder(
-				processDir+"/gcloud-init.sh");
+		String cmdOut = executeCommand(processDir + "/gcloud-init.sh");
+		LOGGER.warn(cmdOut);
+		
+		String sourceIt = "/bin/bash -c " + processDir + "/exportBigtableEnv";
+		String srcOut = executeCommand(sourceIt);
+		LOGGER.warn(cmdOut);
+	}
+
+	private String executeCommand(
+			String command ) {
+		StringBuffer output = new StringBuffer();
+
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(
+					command);
+			p.waitFor();
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(
+							p.getInputStream()));
+
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				output.append(
+						line + "\n");
+			}
+
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return output.toString();
+	}
+
+	// @Override
+	public void setup2() {
+		String processDir = System.getProperty(
+				"user.dir");
+		LOGGER.warn(
+				"KAM >>> Running gcloud install in " + processDir);
+
+		ProcessBuilder pb = new ProcessBuilder();
 
 		try {
 			Process p = pb.start();
@@ -63,8 +116,10 @@ public class BigtableStoreTestEnvironment extends
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		pb.command("source", "exportBigtableEnv");
+
+		pb.command(
+				"source",
+				"exportBigtableEnv");
 		try {
 			Process p = pb.start();
 			p.waitFor();
@@ -77,8 +132,9 @@ public class BigtableStoreTestEnvironment extends
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		LOGGER.warn("KAM >>> GCLOUD SETUP COMPLETE");
+
+		LOGGER.warn(
+				"KAM >>> GCLOUD SETUP COMPLETE");
 	}
 
 	@Override
