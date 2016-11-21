@@ -50,7 +50,11 @@ public class BigtableStoreTestEnvironment extends
 
 	@Override
 	public void setup() {
-		
+		// Bigtable IT's rely on an external gcloud emulator
+	}
+	
+	// Currently being run from travis externally
+	private void initGcloud() {
 		String processDir = System.getProperty(
 				"user.dir");
 		LOGGER.warn(
@@ -98,48 +102,6 @@ public class BigtableStoreTestEnvironment extends
 		}
 
 		return output.toString();
-	}
-
-	// @Override
-	public void setup2() {
-		String processDir = System.getProperty(
-				"user.dir");
-		LOGGER.warn(
-				"KAM >>> Running gcloud install in " + processDir);
-
-		ProcessBuilder pb = new ProcessBuilder();
-
-		try {
-			Process p = pb.start();
-			p.waitFor();
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		pb.command(
-				"source",
-				"exportBigtableEnv");
-		try {
-			Process p = pb.start();
-			p.waitFor();
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		LOGGER.warn(
-				"KAM >>> GCLOUD SETUP COMPLETE");
 	}
 
 	@Override
