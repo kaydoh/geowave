@@ -17,11 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import mil.nga.giat.geowave.test.AccumuloStoreTestEnvironment;
 import mil.nga.giat.geowave.test.GeoWaveITRunner;
 import mil.nga.giat.geowave.test.TestEnvironment;
 import mil.nga.giat.geowave.test.TestUtils;
-import mil.nga.giat.geowave.test.ZookeeperTestEnvironment;
 import mil.nga.giat.geowave.test.mapreduce.MapReduceTestEnvironment;
 
 public class ServicesTestEnvironment implements
@@ -37,6 +35,12 @@ public class ServicesTestEnvironment implements
 		}
 		return singletonInstance;
 	}
+
+	private static String[] PARENT_CLASSLOADER_LIBRARIES = new String[] {
+		"hbase",
+		"hadoop",
+		"protobuf"
+	};
 
 	protected static final int JETTY_PORT = 9011;
 	protected static final String JETTY_BASE_URL = "http://localhost:" + JETTY_PORT;
@@ -55,9 +59,10 @@ public class ServicesTestEnvironment implements
 	protected static final String GEOWAVE_CONTEXT_PATH = "/geowave-services";
 	protected static final String GEOWAVE_BASE_URL = JETTY_BASE_URL + GEOWAVE_CONTEXT_PATH;
 	protected static final String GEOWAVE_WORKSPACE_PATH = GEOSERVER_WAR_DIR + "/data/workspaces/" + TEST_WORKSPACE;
-	protected static final String TEST_STYLE_NAME_NO_DIFFERENCE = "DecimatePoints-2px";
-	protected static final String TEST_STYLE_NAME_MINOR_SUBSAMPLE = "DecimatePoints-10px";
-	protected static final String TEST_STYLE_NAME_MAJOR_SUBSAMPLE = "DecimatePoints-100px";
+	protected static final String TEST_STYLE_NAME_NO_DIFFERENCE = "SubsamplePoints-2px";
+	protected static final String TEST_STYLE_NAME_MINOR_SUBSAMPLE = "SubsamplePoints-10px";
+	protected static final String TEST_STYLE_NAME_MAJOR_SUBSAMPLE = "SubsamplePoints-100px";
+	protected static final String TEST_STYLE_NAME_DISTRIBUTED_RENDER = "DistributedRender";
 	protected static final String TEST_STYLE_PATH = "src/test/resources/sld/";
 	protected static final String TEST_SLD_NO_DIFFERENCE_FILE = TEST_STYLE_PATH + TEST_STYLE_NAME_NO_DIFFERENCE
 			+ ".sld";
@@ -65,6 +70,8 @@ public class ServicesTestEnvironment implements
 			+ ".sld";
 	protected static final String TEST_SLD_MAJOR_SUBSAMPLE_FILE = TEST_STYLE_PATH + TEST_STYLE_NAME_MAJOR_SUBSAMPLE
 			+ ".sld";
+	protected static final String TEST_SLD_DISTRIBUTED_RENDER_FILE = TEST_STYLE_PATH
+			+ TEST_STYLE_NAME_DISTRIBUTED_RENDER + ".sld";
 
 	private Server jettyServer;
 
@@ -75,118 +82,151 @@ public class ServicesTestEnvironment implements
 	public void setup()
 			throws Exception {
 		synchronized (GeoWaveITRunner.MUTEX) {
-			if (jettyServer == null) {
-				try {
-					// Prevent "Unauthorized class found" error
-					System.setProperty(
-							"GEOSERVER_XSTREAM_WHITELIST",
-							"org.geoserver.wfs.**;org.geoserver.wms.**");
+			// Setup activities delegated to private function
+			// to satisfy HP Fortify
+			doSetup();
+		}
+	}
 
-					// delete old workspace configuration if it's still there
-					jettyServer = new Server();
+	private void doSetup() {
+		if (jettyServer == null) {
+			try {
+				// Prevent "Unauthorized class found" error
+				System.setProperty(
+						"GEOSERVER_XSTREAM_WHITELIST",
+						"org.geoserver.wfs.**;org.geoserver.wms.**");
 
-					final SocketConnector conn = new SocketConnector();
-					conn.setPort(JETTY_PORT);
-					conn.setAcceptQueueSize(ACCEPT_QUEUE_SIZE);
-					conn.setMaxIdleTime(MAX_IDLE_TIME);
-					conn.setSoLingerTime(SO_LINGER_TIME);
-					jettyServer.setConnectors(new Connector[] {
-						conn
-					});
+				// delete old workspace configuration if it's still there
+				jettyServer = new Server();
 
-					final WebAppContext gsWebapp = new WebAppContext();
-					gsWebapp.setContextPath(GEOSERVER_CONTEXT_PATH);
-					gsWebapp.setWar(GEOSERVER_WAR_DIR);
+				final SocketConnector conn = new SocketConnector();
+				conn.setPort(JETTY_PORT);
+				conn.setAcceptQueueSize(ACCEPT_QUEUE_SIZE);
+				conn.setMaxIdleTime(MAX_IDLE_TIME);
+				conn.setSoLingerTime(SO_LINGER_TIME);
+				jettyServer.setConnectors(new Connector[] {
+					conn
+				});
 
-					final WebAppClassLoader classLoader = AccessController
-							.doPrivileged(new PrivilegedAction<WebAppClassLoader>() {
-								@Override
-								public WebAppClassLoader run() {
-									try {
-										return new WebAppClassLoader(
-												gsWebapp);
-									}
-									catch (final IOException e) {
-										LOGGER.error(
-												"Unable to create new classloader",
-												e);
-										return null;
-									}
+				final WebAppContext gsWebapp = new WebAppContext();
+				gsWebapp.setContextPath(GEOSERVER_CONTEXT_PATH);
+				gsWebapp.setWar(GEOSERVER_WAR_DIR);
+
+				final WebAppClassLoader classLoader = AccessController
+						.doPrivileged(new PrivilegedAction<WebAppClassLoader>() {
+							@Override
+							public WebAppClassLoader run() {
+								try {
+									return new WebAppClassLoader(
+											gsWebapp);
 								}
-							});
-					if (classLoader == null) {
-						throw new IOException(
-								"Unable to create classloader");
-					}
-
-					// new WebAppClassLoader(
-					// gsWebapp);
-					classLoader.addClassPath(System.getProperty(
-							"java.class.path").replace(
-							":",
-							";"));
-					gsWebapp.setClassLoader(classLoader);
-					gsWebapp.setParentLoaderPriority(true);
-
-					final File warDir = new File(
-							GEOWAVE_WAR_DIR);
-
-					// update the config file
-					ServicesTestUtils.writeConfigFile(new File(
-							warDir,
-							"/WEB-INF/config.properties"));
-
-					final WebAppContext gwWebapp = new WebAppContext();
-					gwWebapp.setContextPath(GEOWAVE_CONTEXT_PATH);
-					gwWebapp.setWar(warDir.getAbsolutePath());
-
-					jettyServer.setHandlers(new WebAppContext[] {
-						gsWebapp,
-						gwWebapp
-					});
-					gsWebapp.setTempDirectory(TestUtils.TEMP_DIR);
-					// this allows to send large SLD's from the styles form
-					gsWebapp.getServletContext().getContextHandler().setMaxFormContentSize(
-							MAX_FORM_CONTENT_SIZE);
-
-					final String jettyConfigFile = System.getProperty("jetty.config.file");
-					if (jettyConfigFile != null) {
-						LOGGER.info("Loading Jetty config from file: " + jettyConfigFile);
-						(new XmlConfiguration(
-								new FileInputStream(
-										jettyConfigFile))).configure(jettyServer);
-					}
-
-					jettyServer.start();
-					while (!jettyServer.isRunning() && !jettyServer.isStarted()) {
-						Thread.sleep(1000);
-					}
-
-					// use this to test normal stop behavior, that is, to check
-					// stuff that need to be done on container shutdown (and
-					// yes, this will make jetty stop just after you started
-					// it...)
-
-					// jettyServer.stop();
-
+								catch (final IOException e) {
+									LOGGER.error(
+											"Unable to create new classloader",
+											e);
+									return null;
+								}
+							}
+						});
+				if (classLoader == null) {
+					throw new IOException(
+							"Unable to create classloader");
 				}
-				catch (final RuntimeException e) {
-					throw e;
-				}
-				catch (final Exception e) {
-					LOGGER.error(
-							"Could not start the Jetty server: " + e.getMessage(),
-							e);
+				final String classpath = System.getProperty(
+						"java.class.path").replace(
+						":",
+						";");
+				final String[] individualEntries = classpath.split(";");
+				final StringBuffer str = new StringBuffer();
+				for (final String e : individualEntries) {
+					// HBase has certain static initializers that use reflection
+					// to get annotated values
 
-					if (jettyServer != null) {
-						try {
-							jettyServer.stop();
+					// because Class instances are not equal if they are loaded
+					// by different class loaders this HBase initialization
+					// fails
+
+					// furthermore HBase's runtime dependencies need to
+					// be loaded by the same classloader, the webapp's parent
+					// class loader
+
+					// but geowave hbase datastore implementation must be loaded
+					// by the same classloader as geotools or the SPI loader
+					// won't work
+
+					boolean addLibraryToWebappContext = true;
+					if (!e.contains("geowave")) {
+						for (final String parentLoaderLibrary : PARENT_CLASSLOADER_LIBRARIES) {
+							if (e.contains(parentLoaderLibrary)) {
+								addLibraryToWebappContext = false;
+								break;
+							}
 						}
-						catch (final Exception e1) {
-							LOGGER.error(
-									"Unable to stop the Jetty server",
-									e1);
-						}
+					}
+					if (addLibraryToWebappContext) {
+						str.append(
+								e).append(
+								";");
+					}
+				}
+				classLoader.addClassPath(str.toString());
+				gsWebapp.setClassLoader(classLoader);
+				// this has to be false for geoserver to load the correct guava
+				// classes (until hadoop updates guava support to a later
+				// version, slated for hadoop 3.x)
+				gsWebapp.setParentLoaderPriority(false);
+
+				final File warDir = new File(
+						GEOWAVE_WAR_DIR);
+
+				// update the config file
+				ServicesTestUtils.writeConfigFile(new File(
+						warDir,
+						"/WEB-INF/config.properties"));
+
+				final WebAppContext gwWebapp = new WebAppContext();
+				gwWebapp.setContextPath(GEOWAVE_CONTEXT_PATH);
+				gwWebapp.setWar(warDir.getAbsolutePath());
+
+				jettyServer.setHandlers(new WebAppContext[] {
+					gsWebapp,
+					gwWebapp
+				});
+				gsWebapp.setTempDirectory(TestUtils.TEMP_DIR);
+				// this allows to send large SLD's from the styles form
+				gsWebapp.getServletContext().getContextHandler().setMaxFormContentSize(
+						MAX_FORM_CONTENT_SIZE);
+
+				final String jettyConfigFile = System.getProperty("jetty.config.file");
+				if (jettyConfigFile != null) {
+					LOGGER.info("Loading Jetty config from file: " + jettyConfigFile);
+					(new XmlConfiguration(
+							new FileInputStream(
+									jettyConfigFile))).configure(jettyServer);
+				}
+
+				jettyServer.start();
+				while (!jettyServer.isRunning() && !jettyServer.isStarted()) {
+					Thread.sleep(1000);
+				}
+
+			}
+			catch (final RuntimeException e) {
+				throw e;
+			}
+			catch (final Exception e) {
+				LOGGER.error(
+						"Could not start the Jetty server: " + e.getMessage(),
+						e);
+
+				if (jettyServer.isRunning()) {
+					try {
+						jettyServer.stop();
+					}
+					catch (final Exception e1) {
+						LOGGER.error(
+								"Unable to stop the Jetty server",
+								e1);
 					}
 				}
 			}

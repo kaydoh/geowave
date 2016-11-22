@@ -1,26 +1,37 @@
 package mil.nga.giat.geowave.core.store.query.aggregate;
 
 import mil.nga.giat.geowave.core.index.Persistable;
+import mil.nga.giat.geowave.core.store.data.CommonIndexedPersistenceEncoding;
 
-public class CountAggregation<T> implements
-		Aggregation<Persistable, CountResult, T>
+public class CountAggregation implements
+		CommonIndexAggregation<Persistable, CountResult>
 {
-	private CountResult countResult = new CountResult();
+	private long count = Long.MIN_VALUE;
 
 	public CountAggregation() {}
 
+	public boolean isSet() {
+		return count != Long.MIN_VALUE;
+	}
+
 	@Override
 	public String toString() {
-		return countResult.toString();
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append(
+				"count[count=").append(
+				count);
+		buffer.append("]");
+		return buffer.toString();
 	}
 
 	@Override
 	public void aggregate(
-			final T entry ) {
-		if (!countResult.isSet()) {
-			countResult.count = 0;
+			final CommonIndexedPersistenceEncoding entry ) {
+		if (!isSet()) {
+			count = 0;
 		}
-		countResult.count += 1;
+
+		count += 1;
 	}
 
 	@Override
@@ -30,10 +41,12 @@ public class CountAggregation<T> implements
 
 	@Override
 	public CountResult getResult() {
-		if (!countResult.isSet()) {
+		if (!isSet()) {
 			return null;
 		}
-		return countResult;
+
+		return new CountResult(
+				count);
 	}
 
 	@Override
@@ -42,6 +55,6 @@ public class CountAggregation<T> implements
 
 	@Override
 	public void clearResult() {
-		countResult = new CountResult();
+		count = 0;
 	}
 }

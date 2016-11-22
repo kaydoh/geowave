@@ -5,13 +5,16 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
+import mil.nga.giat.geowave.test.basic.GeoWaveBasicRasterIT;
+import mil.nga.giat.geowave.test.basic.GeoWaveBasicSpatialTemporalVectorIT;
+import mil.nga.giat.geowave.test.basic.GeoWaveBasicSpatialVectorIT;
+import mil.nga.giat.geowave.test.basic.GeoWaveVectorSerializationIT;
 import mil.nga.giat.geowave.test.config.ConfigCacheIT;
 import mil.nga.giat.geowave.test.kafka.BasicKafkaIT;
 import mil.nga.giat.geowave.test.landsat.LandsatIT;
 import mil.nga.giat.geowave.test.mapreduce.BasicMapReduceIT;
 import mil.nga.giat.geowave.test.mapreduce.BulkIngestInputGenerationIT;
 import mil.nga.giat.geowave.test.mapreduce.DBScanIT;
-import mil.nga.giat.geowave.test.mapreduce.GeoWaveKMeansIT;
 import mil.nga.giat.geowave.test.mapreduce.GeoWaveNNIT;
 import mil.nga.giat.geowave.test.mapreduce.KDERasterResizeIT;
 import mil.nga.giat.geowave.test.query.AttributesSubsetQueryIT;
@@ -25,14 +28,16 @@ import mil.nga.giat.geowave.test.store.DataStatisticsStoreIT;
 
 @RunWith(GeoWaveITSuiteRunner.class)
 @SuiteClasses({
-	GeoWaveBasicIT.class,
+	GeoWaveBasicSpatialVectorIT.class,
+	GeoWaveBasicSpatialTemporalVectorIT.class,
+	GeoWaveVectorSerializationIT.class,
 	BasicKafkaIT.class,
 	BasicMapReduceIT.class,
-	GeoWaveRasterIT.class,
+	GeoWaveBasicRasterIT.class,
 	LandsatIT.class,
 	BulkIngestInputGenerationIT.class,
 	KDERasterResizeIT.class,
-	GeoWaveKMeansIT.class,
+	// GeoWaveKMeansIT.class,
 	GeoWaveNNIT.class,
 	GeoServerIT.class,
 	GeoWaveServicesIT.class,

@@ -87,7 +87,6 @@ public class PersistenceUtils
 
 		final String className = StringUtils.stringFromBinary(classNameBinary);
 
-		if (LOGGER.isTraceEnabled()) LOGGER.trace("Loading class " + className);
 		final T retVal = classFactory(
 				className,
 				expectedType);
@@ -107,9 +106,9 @@ public class PersistenceUtils
 		try {
 			factoryType = Class.forName(className);
 		}
-		catch (final Throwable e) {
+		catch (final ClassNotFoundException e) {
 			LOGGER.warn(
-					"error creating class: could not find class " + className,
+					"error creating class: could not find class ",
 					e);
 		}
 
@@ -118,20 +117,23 @@ public class PersistenceUtils
 
 			try {
 				// use the no arg constructor and make sure its accessible
+
+				// HP Fortify "Access Specifier Manipulation"
+				// This method is being modified by trusted code,
+				// in a way that is not influenced by user input
 				final Constructor<?> noArgConstructor = factoryType.getDeclaredConstructor();
 				noArgConstructor.setAccessible(true);
 				factoryClassInst = noArgConstructor.newInstance();
 			}
-			catch (final Throwable e) {
+			catch (final Exception e) {
 				LOGGER.warn(
-						"error creating class: could not create class " + className,
+						"error creating class: could not create class ",
 						e);
 			}
 
 			if (factoryClassInst != null) {
 				if (!expectedType.isAssignableFrom(factoryClassInst.getClass())) {
-					LOGGER.warn("error creating class: " + className + " does not implement "
-							+ expectedType.getCanonicalName());
+					LOGGER.warn("error creating class, does not implement expected type");
 				}
 				else {
 					return ((T) factoryClassInst);

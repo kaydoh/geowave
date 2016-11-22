@@ -113,14 +113,17 @@ public class SimpleFeatureUserDataConfigurationSet
 	@SuppressWarnings("deprecation")
 	public static SimpleFeatureType configureType(
 			final SimpleFeatureType type ) {
+		// HP Fortify "Path Manipulation" false positive
+		// What Fortify considers "user input" comes only
+		// from users with OS-level access anyway
 		final String configFileName = System.getProperty(SIMPLE_FEATURE_CONFIG_FILE_PROP);
 		if (configFileName != null) {
 			final File configFile = new File(
 					configFileName);
 			if (configFile.exists() && configFile.canRead()) {
-				try (Reader reader = new InputStreamReader(
-						new FileInputStream(
-								configFile),
+				try (FileInputStream input = new FileInputStream(
+						configFile); Reader reader = new InputStreamReader(
+						input,
 						"UTF-8")) {
 					final ObjectMapper mapper = new ObjectMapper();
 					final SerializationConfig serializationConfig = mapper.getSerializationConfig();
@@ -131,6 +134,9 @@ public class SimpleFeatureUserDataConfigurationSet
 					instance.updateType(type);
 				}
 				catch (final IOException e) {
+					// HP Fortify "Log Forging" false positive
+					// What Fortify considers "user input" comes only
+					// from users with OS-level access anyway
 					LOGGER.error(
 							"Cannot parse JSON congiguration file " + configFileName,
 							e);

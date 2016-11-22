@@ -65,7 +65,7 @@ public class ConstraintsQuery
 	}
 
 	public boolean isAggregation() {
-		return ((aggregation != null) && (aggregation.getLeft() != null) && (aggregation.getRight() != null));
+		return ((aggregation != null) && (aggregation.getRight() != null));
 	}
 
 	public List<ByteArrayRange> getRanges() {
@@ -73,7 +73,7 @@ public class ConstraintsQuery
 			final List<ByteArrayRange> ranges = DataStoreUtils.constraintsToByteArrayRanges(
 					constraints,
 					index.getIndexStrategy(),
-					MAX_RANGE_DECOMPOSITION,
+					1,
 					indexMetaData);
 			if ((ranges == null) || (ranges.size() < 2)) {
 				return ranges;
@@ -98,12 +98,16 @@ public class ConstraintsQuery
 			return retVal;
 		}
 		else {
-			return DataStoreUtils.constraintsToByteArrayRanges(
-					constraints,
-					index.getIndexStrategy(),
-					MAX_RANGE_DECOMPOSITION,
-					indexMetaData);
+			return getAllRanges();
 		}
+	}
+
+	public List<ByteArrayRange> getAllRanges() {
+		return DataStoreUtils.constraintsToByteArrayRanges(
+				constraints,
+				index.getIndexStrategy(),
+				MAX_RANGE_DECOMPOSITION,
+				indexMetaData);
 	}
 
 	private SplitFilterLists splitList(

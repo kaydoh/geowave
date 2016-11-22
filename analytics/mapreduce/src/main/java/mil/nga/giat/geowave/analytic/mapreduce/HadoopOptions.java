@@ -47,13 +47,16 @@ public class HadoopOptions
 		if (name != null) {
 			try (FileInputStream in = new FileInputStream(
 					name)) {
+				// HP Fortify "Path Manipulation" false positive
+				// What fortify identifies as "user input" comes
+				// only from users with OS-level access anyway
 				config.addResource(
 						in,
 						name);
 			}
 			catch (final IOException ex) {
 				LOGGER.error(
-						"Configuration file " + name + " not found",
+						"Configuration file not found",
 						ex);
 				throw ex;
 			}
@@ -70,7 +73,7 @@ public class HadoopOptions
 		}
 		final FileSystem fs = FileSystem.get(config);
 		if (!fs.exists(basePath)) {
-			LOGGER.error("HDFS base directory " + basePath + " does not exist");
+			LOGGER.error("HDFS base directory does not exist");
 			return;
 		}
 	}

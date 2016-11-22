@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>geowave-parent</artifactId>
@@ -33,6 +34,11 @@
 		<dependency>
 			<groupId>mil.nga.giat</groupId>
 			<artifactId>geowave-datastore-accumulo</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>mil.nga.giat</groupId>
+			<artifactId>geowave-datastore-hbase</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -267,6 +273,12 @@
 						<scope>${accumulo.scope}</scope>
 					</dependency>
 					<dependency>
+						<groupId>org.apache.hbase</groupId>
+						<artifactId>hbase-client</artifactId>
+						<version>${hbase.version}</version>
+						<scope>${hbase.scope}</scope>
+					</dependency>
+					<dependency>
 						<groupId>org.apache.hadoop</groupId>
 						<artifactId>hadoop-common</artifactId>
 						<version>${hadoop.version}</version>
@@ -279,12 +291,21 @@
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.1</version>
-						<configuration>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly${container.extension}.xml</descriptor>
-							</descriptors>
-							<finalName>${project.build.finalName}${container.extension}</finalName>
-						</configuration>
+						<executions>
+							<execution>
+								<id>distro-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/assembly${container.extension}.xml</descriptor>
+									</descriptors>
+									<finalName>${project.build.finalName}${container.extension}</finalName>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
@@ -300,6 +321,12 @@
 						<artifactId>accumulo-core</artifactId>
 						<version>${accumulo.version}</version>
 						<scope>${accumulo.scope}</scope>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.hbase</groupId>
+						<artifactId>hbase-client</artifactId>
+						<version>${hbase.version}</version>
+						<scope>${hbase.scope}</scope>
 					</dependency>
 					<dependency>
 						<groupId>org.apache.hadoop</groupId>
@@ -330,7 +357,10 @@
 											<exclude>*:pom:*</exclude>
 											<exclude>log4j:log4j</exclude>
 											<exclude>commons-codec:commons-codec</exclude>
-											<exclude>com.google.guava:guava</exclude>
+											<exclude>com.google.guava:guava:*</exclude>
+
+											<!-- even though guava should exist in geoserver's classpath, 
+												<exclude>com.google.guava:guava</exclude> -->
 
 											<!-- even though commons-lang should exist in geoserver's classpath 
 												it is version 2.1 which is missing necessary classes, <exclude>*:commons-lang:*</exclude> -->
@@ -490,6 +520,59 @@
 									<createDependencyReducedPom>false</createDependencyReducedPom>
 									<minimizeJar>false</minimizeJar>
 									<finalName>${project.build.finalName}-accumulo-singlejar</finalName>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>hbase-singlejar</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>2.2</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<artifactSet>
+										<excludes>
+											<exclude>org.slf4j:*</exclude>
+										</excludes>
+									</artifactSet>
+									<filters>
+										<filter>
+											<artifact>*:*</artifact>
+											<excludes>
+												<exclude>META-INF/*.SF</exclude>
+												<exclude>META-INF/*.DSA</exclude>
+												<exclude>META-INF/*.RSA</exclude>
+											</excludes>
+										</filter>
+									</filters>
+									<transformers>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<manifestEntries>
+												<Specification-Title>GeoWave</Specification-Title>
+												<Specification-Vendor>LocationTech</Specification-Vendor>
+												<Specification-Version>${project.version}</Specification-Version>
+												<Implementation-Title>mil.nga.giat.geowave</Implementation-Title>
+												<Implementation-Vendor>LocationTech</Implementation-Vendor>
+												<Implementation-Version>${project.version}</Implementation-Version>
+											</manifestEntries>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+									</transformers>
+									<createDependencyReducedPom>false</createDependencyReducedPom>
+									<minimizeJar>false</minimizeJar>
+									<finalName>${project.build.finalName}-hbase-singlejar</finalName>
 								</configuration>
 							</execution>
 						</executions>

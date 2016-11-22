@@ -53,13 +53,9 @@ public class MinimalBinDistanceHistogram implements
 	public MinimalBinDistanceHistogram() {
 		totalCount = 0;
 
-		// init the RNG for breaking ties in histogram merging. A fixed seed is
-		// specified here
-		// to aid testing, but can be eliminated to use a time-based seed (which
-		// would
-		// make the algorithm non-deterministic).
+		// init the RNG for breaking ties in histogram merging.
 		prng = new Random(
-				31183);
+				System.currentTimeMillis());
 
 		bins = new ArrayList<Bin>(
 				1024);
@@ -72,13 +68,9 @@ public class MinimalBinDistanceHistogram implements
 			final int size ) {
 		totalCount = 0;
 
-		// init the RNG for breaking ties in histogram merging. A fixed seed is
-		// specified here
-		// to aid testing, but can be eliminated to use a time-based seed (which
-		// would
-		// make the algorithm non-deterministic).
+		// init the RNG for breaking ties in histogram merging.
 		prng = new Random(
-				31183);
+				System.currentTimeMillis());
 
 		bins = new ArrayList<Bin>(
 				size);
@@ -258,6 +250,9 @@ public class MinimalBinDistanceHistogram implements
 					smallestdiffcount = 1;
 				}
 				else {
+					// HP Fortify "Insecure Randomness" false positive
+					// This random number is not used for any purpose
+					// related to security or cryptography
 					if (((diff - smallestdiff) < 1E-12) && (prng.nextDouble() <= (1.0 / ++smallestdiffcount))) {
 						smallestdiffloc = i;
 					}
