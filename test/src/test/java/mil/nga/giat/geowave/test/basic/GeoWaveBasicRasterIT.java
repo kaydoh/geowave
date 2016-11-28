@@ -48,6 +48,7 @@ public class GeoWaveBasicRasterIT
 	private static final double DOUBLE_TOLERANCE = 1E-10d;
 	@GeoWaveTestStore({
 		GeoWaveStoreType.ACCUMULO,
+		GeoWaveStoreType.BIGTABLE,
 		GeoWaveStoreType.HBASE
 	})
 	protected DataStorePluginOptions dataStoreOptions;

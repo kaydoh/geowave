@@ -83,8 +83,7 @@ public class GeoServerIT
 		GeoWaveStoreType.BIGTABLE,
 		GeoWaveStoreType.HBASE
 	}, options = {
-		"bigtable=true",
-		"enableCustomFilters=false",
+		"enableCustomFilters=true",
 		"enableCoprocessors=false"
 	})
 	protected DataStorePluginOptions dataStoreOptions;
