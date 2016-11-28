@@ -272,21 +272,21 @@ public class GeoWaveITRunner extends
 		List<GeoWaveStoreRunnerConfig> configs = new ArrayList<GeoWaveStoreRunnerConfig>();
 
 		final String storeTypeProp = System.getProperty(STORE_TYPE_PROPERTY_NAME);
-
-		boolean typeOverridden = false;
+		
+		// See if user specified a single store type
 		if (TestUtils.isSet(storeTypeProp)) {
 			final Set<String> dataStoreOptionFields = getDataStoreOptionFieldsForTypeAnnotation();
 			final GeoWaveStoreType storeType = GeoWaveStoreType.valueOf(storeTypeProp);
+			
+			// If no match, the configs list will be empty and the IT will be a no-op
 			if (containsAnnotationForType(storeType)) {
-				typeOverridden = true;
 				configs.add(new GeoWaveStoreRunnerConfig(
 						storeType,
 						dataStoreOptionFields));
 				storeTypes.add(storeType);
 			}
 		}
-
-		if (!typeOverridden) {
+		else { // No user override - just use the IT's list of types
 			if (typeIsAnnotated()) {
 				if (fieldsAreAnnotated()) {
 					throw new GeoWaveITException(
@@ -313,6 +313,8 @@ public class GeoWaveITRunner extends
 				}
 			}
 		}
+		
+		// Create a test runner for each store type / config
 		for (final GeoWaveStoreRunnerConfig config : configs) {
 			final TestClassRunnerForStoreTypes runner = new TestClassRunnerForStoreTypes(
 					getTestClass().getJavaClass(),
