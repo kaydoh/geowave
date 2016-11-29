@@ -4,6 +4,7 @@
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SKIP_TESTS="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 
@@ -16,9 +17,9 @@ if [ -f $SCRIPT_DIR/build-args-matrix.sh ]; then
 else
 	# Default build arguments
     BUILD_ARGS_MATRIX=(
-      "-Daccumulo.version=1.6.0-cdh5.1.4 -Dhadoop.version=2.6.0-cdh5.4.0 -Dgeotools.version=13.0 -Dgeoserver.version=2.7.3 -Dvendor.version=cdh5 -P cloudera"
-      "-Daccumulo.version=1.6.2 -Dhadoop.version=2.6.0 -Dgeotools.version=13.2 -Dgeoserver.version=2.7.3 -Dvendor.version=apache -Dvendor.version=apache -P \"\""
-      "-Daccumulo.version=1.6.1.2.2.4.0-2633 -Dhadoop.version=2.6.0.2.2.4.0-2633 -Dgeotools.version=13.2 -Dgeoserver.version=2.7.3 -Dvendor.version=hdp2 -P hortonworks"
+ "-Daccumulo.version=1.7.2 -Daccumulo.api=1.7 -Dhadoop.version=2.7.3 -Dgeotools.version=16.0 -Dgeoserver.version=2.10.0 -Dhbase.version=1.2.3 -Dvendor.version=apache"
+ "-Daccumulo.version=1.7.2-cdh5.5.0 -Daccumulo.api=1.7 -Dhadoop.version=2.6.0-cdh5.9.0 -Dgeotools.version=16.0 -Dgeoserver.version=2.10.0 -Dhbase.version=1.2.0-cdh5.9.0 -P cloudera -Dvendor.version=cdh5"
+ "-Daccumulo.version=1.7.0.2.4.2.0-258 -Daccumulo.api=1.7 -Dhadoop.version=2.7.1.2.4.2.0-258 -Dgeotools.version=16.0 -Dgeoserver.version=2.10.0 -Dhbase.version=1.1.2.2.4.2.0-258 -P hortonworks -Dvendor.version=hdp2"
     )
 fi
 
@@ -36,7 +37,7 @@ do
 		-e WORKSPACE=/usr/src/geowave \
 		-e BUILD_ARGS="$build_args" \
 		-e MAVEN_OPTS="-Xmx1500m" \
-		-v $HOME:/root -v $HOME/geowave:/usr/src/geowave \
+		-v $HOME:/root -v $WORKSPACE:/usr/src/geowave \
 		ngageoint/geowave-centos6-java8-build \
 		/bin/bash -c \
 		"cd \$WORKSPACE && $MVN_BUILD_AND_TEST_CMD && $MVN_PACKAGE_FAT_JARS_CMD"
@@ -44,7 +45,7 @@ do
 	sudo docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
-    	-v $HOME/geowave:/usr/src/geowave \
+    	-v $WORKSPACE:/usr/src/geowave \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
     	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh"

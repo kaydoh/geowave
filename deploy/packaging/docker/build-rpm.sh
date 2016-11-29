@@ -4,14 +4,14 @@
 #
 
 # Set a default version
-VENDOR_VERSION=cdh
+VENDOR_VERSION=apache
 
 if [ -z $GEOSERVER_DOWNLOAD_BASE ]; then
-	GEOSERVER_DOWNLOAD_BASE=https://s3.amazonaws.com/geowave/third-party-downloads/geoserver
+	GEOSERVER_DOWNLOAD_BASE=https://s3.amazonaws.com/geowave-deploy/third-party-downloads/geoserver
 fi
 
 if [ -z $GEOSERVER_VERSION ]; then
-	GEOSERVER_VERSION=geoserver-2.7.3-bin.zip
+	GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
 fi
 
 GEOSERVER_ARTIFACT=/usr/src/geowave/deploy/packaging/rpm/centos/6/SOURCES/geoserver.zip
