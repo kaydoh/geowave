@@ -16,6 +16,8 @@ import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.Filter.ReturnCode;
+import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.log4j.Logger;
@@ -73,7 +75,8 @@ public class HBaseDataStore extends
 {
 	public final static String TYPE = "hbase";
 
-	private final static Logger LOGGER = Logger.getLogger(HBaseDataStore.class);
+	private final static Logger LOGGER = Logger.getLogger(
+			HBaseDataStore.class);
 
 	private final BasicHBaseOperations operations;
 	private final HBaseOptions options;
@@ -180,10 +183,11 @@ public class HBaseDataStore extends
 			final String indexName,
 			final DataAdapter<T> adapter ) {
 		try {
-			callbacks.add(new AltIndexCallback<T>(
-					indexName,
-					(WritableDataAdapter<T>) adapter,
-					options));
+			callbacks.add(
+					new AltIndexCallback<T>(
+							indexName,
+							(WritableDataAdapter<T>) adapter,
+							options));
 
 		}
 		catch (final Exception e) {
@@ -203,31 +207,74 @@ public class HBaseDataStore extends
 			final DedupeFilter dedupeFilter,
 			final String[] authorizations ) {
 
-		final String tableName = StringUtils.stringFromBinary(index.getId().getBytes());
+		final String tableName = StringUtils.stringFromBinary(
+				index.getId().getBytes());
 
 		final List<Iterator<Result>> resultList = new ArrayList<Iterator<Result>>();
 		final List<ResultScanner> resultScanners = new ArrayList<ResultScanner>();
 		Iterator<Result> iterator = null;
 
 		try {
+			final Scan scanner = new Scan();
+			scanner.addFamily(
+					adapter.getAdapterId().getBytes());
 
-			for (final ByteArrayId dataId : dataIds) {
-				final Scan scanner = new Scan();
-				scanner.setFilter(new SingleEntryFilter(
-						dataId.getBytes(),
-						adapter.getAdapterId().getBytes()));
-				final ResultScanner results = operations.getScannedResults(
-						scanner,
-						tableName,
-						authorizations);
-				resultScanners.add(results);
-				final Iterator<Result> resultIt = results.iterator();
-				if (resultIt.hasNext()) {
-					resultList.add(resultIt);
+			if (options.isEnableCustomFilters()) {
+				final FilterList filterList = new FilterList();
+
+				for (final ByteArrayId dataId : dataIds) {
+					filterList.addFilter(
+							new SingleEntryFilter(
+									dataId.getBytes(),
+									adapter.getAdapterId().getBytes()));
+				}
+				
+				if (!filterList.getFilters().isEmpty()) {
+					scanner.setFilter(filterList);
 				}
 			}
 
-			iterator = Iterators.concat(resultList.iterator());
+			final ResultScanner results = operations.getScannedResults(
+					scanner,
+					tableName,
+					authorizations);
+			
+			Iterator<Result> resultIt;
+			
+			if (!options.isEnableCustomFilters()) {
+				ArrayList<Result> filteredResults = new ArrayList<Result>();
+				
+				while (results.iterator().hasNext()) {
+					Result result = results.iterator().next();
+					
+					for (final ByteArrayId dataId : dataIds) {
+						SingleEntryFilter filter = new SingleEntryFilter(
+								dataId.getBytes(),
+								adapter.getAdapterId().getBytes());
+						
+						if (filter.filterKeyValue(result.current()) == ReturnCode.INCLUDE) {
+							filteredResults.add(result);
+							break;
+						}
+					}
+				}
+				
+				resultIt = filteredResults.iterator();
+			}
+			else {
+				resultIt = results.iterator();
+			}
+			
+			resultScanners.add(
+					results);
+			
+			if (resultIt.hasNext()) {
+				resultList.add(
+						resultIt);
+			}
+
+			iterator = Iterators.concat(
+					resultList.iterator());
 		}
 		catch (final IOException e) {
 			LOGGER.warn(
@@ -259,12 +306,16 @@ public class HBaseDataStore extends
 
 		final List<ByteArrayId> result = new ArrayList<ByteArrayId>();
 		try {
-			if (options.isUseAltIndex() && operations.tableExists(tableName)) {
+			if (options.isUseAltIndex() && operations.tableExists(
+					tableName)) {
 				for (final ByteArrayId dataId : dataIds) {
 					final Scan scanner = new Scan();
-					scanner.setStartRow(dataId.getBytes());
-					scanner.setStopRow(dataId.getBytes());
-					scanner.addFamily(adapterId.getBytes());
+					scanner.setStartRow(
+							dataId.getBytes());
+					scanner.setStopRow(
+							dataId.getBytes());
+					scanner.addFamily(
+							adapterId.getBytes());
 
 					final ResultScanner results = operations.getScannedResults(
 							scanner,
@@ -272,9 +323,11 @@ public class HBaseDataStore extends
 							authorizations);
 					final Iterator<Result> iterator = results.iterator();
 					while (iterator.hasNext()) {
-						result.add(new ByteArrayId(
-								CellUtil.cloneQualifier(iterator.next().listCells().get(
-										0))));
+						result.add(
+								new ByteArrayId(
+										CellUtil.cloneQualifier(
+												iterator.next().listCells().get(
+														0))));
 					}
 				}
 			}
@@ -317,7 +370,8 @@ public class HBaseDataStore extends
 				sanitizedQueryOptions.getFieldIdsAdapterPair(),
 				sanitizedQueryOptions.getAuthorizations());
 
-		hbaseQuery.setOptions(options);
+		hbaseQuery.setOptions(
+				options);
 
 		return hbaseQuery.query(
 				operations,
@@ -340,7 +394,8 @@ public class HBaseDataStore extends
 				sanitizedQueryOptions.getLimit(),
 				sanitizedQueryOptions.getAuthorizations());
 
-		prefixQuery.setOptions(options);
+		prefixQuery.setOptions(
+				options);
 
 		return prefixQuery.query(
 				operations,
@@ -364,7 +419,8 @@ public class HBaseDataStore extends
 				filter,
 				sanitizedQueryOptions.getAuthorizations());
 
-		q.setOptions(options);
+		q.setOptions(
+				options);
 
 		return q.query(
 				operations,
@@ -380,11 +436,13 @@ public class HBaseDataStore extends
 			throws Exception {
 		final List<Delete> deletes = new ArrayList<Delete>();
 		for (final ByteArrayId id : rowIds) {
-			deletes.add(new Delete(
-					id.getBytes()));
+			deletes.add(
+					new Delete(
+							id.getBytes()));
 		}
 		if (idxDeleter instanceof HBaseWriter) {
-			((HBaseWriter) idxDeleter).delete(deletes);
+			((HBaseWriter) idxDeleter).delete(
+					deletes);
 		}
 	}
 
@@ -418,9 +476,12 @@ public class HBaseDataStore extends
 				for (final Result r : results) {
 					final Delete delete = new Delete(
 							r.getRow());
-					delete.addFamily(StringUtils.stringToBinary(columnFamily));
+					delete.addFamily(
+							StringUtils.stringToBinary(
+									columnFamily));
 
-					deleter.delete(delete);
+					deleter.delete(
+							delete);
 				}
 			}
 			return true;
@@ -498,18 +559,23 @@ public class HBaseDataStore extends
 				throws IOException {
 			this.adapter = adapter;
 			altIdxTableName = indexName + ALT_INDEX_TABLE;
-			if (operations.tableExists(indexName)) {
-				if (!operations.tableExists(altIdxTableName)) {
+			if (operations.tableExists(
+					indexName)) {
+				if (!operations.tableExists(
+						altIdxTableName)) {
 					throw new TableNotFoundException(
 							altIdxTableName);
 				}
 			}
 			else {
 				// index table does not exist yet
-				if (operations.tableExists(altIdxTableName)) {
-					operations.deleteTable(altIdxTableName);
-					LOGGER.warn("Deleting current alternate index table [" + altIdxTableName
-							+ "] as main table does not yet exist.");
+				if (operations.tableExists(
+						altIdxTableName)) {
+					operations.deleteTable(
+							altIdxTableName);
+					LOGGER.warn(
+							"Deleting current alternate index table [" + altIdxTableName
+									+ "] as main table does not yet exist.");
 				}
 			}
 
