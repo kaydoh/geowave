@@ -15,9 +15,9 @@ class geowave::server {
     }
   }
 
-  file {'/usr/local/geowave/geoserver/etc/jetty.xml':
+  file {'/usr/local/geowave/geoserver/start.ini':
     ensure  => file,
-    content => template('geowave/jetty.xml.erb'),
+    content => template('geowave/start.ini.erb'),
     owner   => 'geowave',
     group   => 'geowave',
     mode    => '644',
