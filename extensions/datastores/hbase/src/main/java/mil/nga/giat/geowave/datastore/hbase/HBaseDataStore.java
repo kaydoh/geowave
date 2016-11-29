@@ -6,7 +6,9 @@ package mil.nga.giat.geowave.datastore.hbase;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,7 +18,6 @@ import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.Filter.ReturnCode;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
@@ -216,6 +217,9 @@ public class HBaseDataStore extends
 
 		try {
 			final Scan scanner = new Scan();
+			scanner.setMaxVersions(
+					1);
+
 			scanner.addFamily(
 					adapter.getAdapterId().getBytes());
 
@@ -228,9 +232,10 @@ public class HBaseDataStore extends
 									dataId.getBytes(),
 									adapter.getAdapterId().getBytes()));
 				}
-				
+
 				if (!filterList.getFilters().isEmpty()) {
-					scanner.setFilter(filterList);
+					scanner.setFilter(
+							filterList);
 				}
 			}
 
@@ -238,36 +243,32 @@ public class HBaseDataStore extends
 					scanner,
 					tableName,
 					authorizations);
-			
+
 			Iterator<Result> resultIt;
-			
+
 			if (!options.isEnableCustomFilters()) {
 				ArrayList<Result> filteredResults = new ArrayList<Result>();
-				
-				while (results.iterator().hasNext()) {
-					Result result = results.iterator().next();
-					
-					for (final ByteArrayId dataId : dataIds) {
-						SingleEntryFilter filter = new SingleEntryFilter(
-								dataId.getBytes(),
-								adapter.getAdapterId().getBytes());
-						
-						if (filter.filterKeyValue(result.current()) == ReturnCode.INCLUDE) {
-							filteredResults.add(result);
-							break;
-						}
+
+				for (Result result = results.next(); result != null; result = results.next()) {
+					byte[] rowId = result.getRow();
+
+					if (rowHasData(
+							rowId,
+							dataIds)) {
+						filteredResults.add(
+								result);
 					}
 				}
-				
+
 				resultIt = filteredResults.iterator();
 			}
 			else {
 				resultIt = results.iterator();
 			}
-			
+
 			resultScanners.add(
 					results);
-			
+
 			if (resultIt.hasNext()) {
 				resultList.add(
 						resultIt);
@@ -295,6 +296,46 @@ public class HBaseDataStore extends
 						null,
 						true,
 						false));
+	}
+
+	protected boolean rowHasData(
+			final byte[] rowId,
+			final List<ByteArrayId> dataIds )
+			throws IOException {
+
+		final byte[] metadata = Arrays.copyOfRange(
+				rowId,
+				rowId.length - 12,
+				rowId.length);
+
+		final ByteBuffer metadataBuf = ByteBuffer.wrap(
+				metadata);
+		final int adapterIdLength = metadataBuf.getInt();
+		final int dataIdLength = metadataBuf.getInt();
+
+		final ByteBuffer buf = ByteBuffer.wrap(
+				rowId,
+				0,
+				rowId.length - 12);
+		final byte[] indexId = new byte[rowId.length - 12 - adapterIdLength - dataIdLength];
+		final byte[] rawAdapterId = new byte[adapterIdLength];
+		final byte[] rawDataId = new byte[dataIdLength];
+		buf.get(
+				indexId);
+		buf.get(
+				rawAdapterId);
+		buf.get(
+				rawDataId);
+
+		for (ByteArrayId dataId : dataIds) {
+			if (Arrays.equals(
+					rawDataId,
+					dataId.getBytes())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
