@@ -11,6 +11,6 @@
     git clone https://github.com/jwomeara/jace.git;
     cd jace;
     git checkout tags/v1.3.0;
-    /tmp/apache-maven-3.2.2/bin/mvn -q clean install -Dsources $BUILD_ARGS "$@"
+    /tmp/apache-maven-3.2.2/bin/mvn -q clean install -Dsources "$@"
     cd ../..;
 #fi 

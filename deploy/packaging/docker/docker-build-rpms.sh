@@ -45,11 +45,11 @@ do
 	#	"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
 
 #	docker run --rm \
-    	-e WORKSPACE=/usr/src/geowave \
-    	-e BUILD_ARGS="$build_args" \
-		-e LOCAL_USER_ID="$(whoami)" \
-    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
-    	ngageoint/geowave-centos6-rpm-build \
-    	/bin/bash -c \
-    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh && chown -R $LOCAL_USER_ID $WORKSPACE/deploy/packaging"
+#    	-e WORKSPACE=/usr/src/geowave \
+#    	-e BUILD_ARGS="$build_args" \
+#		-e LOCAL_USER_ID="$(whoami)" \
+#    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+#    	ngageoint/geowave-centos6-rpm-build \
+#    	/bin/bash -c \
+#    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh && chown -R $LOCAL_USER_ID $WORKSPACE/deploy/packaging"
 done
