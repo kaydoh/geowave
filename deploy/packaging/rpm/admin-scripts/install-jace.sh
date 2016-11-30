@@ -7,10 +7,10 @@ then
         rm -rf jace-maven-plugin
     fi
     mkdir jace-maven-plugin;
-   cd jace-maven-plugin;
+    cd jace-maven-plugin;
     git clone https://github.com/jwomeara/jace.git;
-   cd jace;
+    cd jace;
     git checkout tags/v1.3.0;
-   /tmp/apache-maven-3.2.2/bin/mvn -q clean install -Dsources $BUILD_ARGS;
-   cd ../..;
+    /tmp/apache-maven-3.2.2/bin/mvn -q clean install -Dsources $BUILD_ARGS;
+    cd ../..;
 fi 

@@ -49,8 +49,8 @@ fi
 
 # Build and archive HTML/PDF docs
 if [ ! -f $WORKSPACE/target/site.tar.gz ]; then
-    /tmp/apache-maven-3.2.2/bin/mvn javadoc:aggregate
-    /tmp/apache-maven-3.2.2/bin/mvn -P docs -pl docs install
+    /tmp/apache-maven-3.2.2/bin/mvn javadoc:aggregate $BUILD_ARGS
+    /tmp/apache-maven-3.2.2/bin/mvn -P docs -pl docs install $BUILD_ARGS
     tar -czf $WORKSPACE/target/site.tar.gz -C $WORKSPACE/target site
 fi
 
