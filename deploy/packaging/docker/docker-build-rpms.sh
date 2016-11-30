@@ -32,7 +32,7 @@ $WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command clean
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
 	export BUILD_ARGS="$build_args"
-	/usr/src/geowave/deploy/packaging/rpm/admin-scripts/jenkins-build-geowave.sh $SKIP_EXTRA
+	$WORKSPACE/deploy/packaging/rpm/admin-scripts/jenkins-build-geowave.sh $SKIP_EXTRA
 	
 	#docker run --rm \
 	#	-e WORKSPACE=/usr/src/geowave \
