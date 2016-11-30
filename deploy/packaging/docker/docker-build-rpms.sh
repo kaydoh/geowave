@@ -4,7 +4,7 @@
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
+SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests -Dmaven.repo.local=$WORKSPACE/.m2"
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
@@ -33,16 +33,17 @@ $WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command clean
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
 	export BUILD_ARGS="$build_args"
-
-	docker run --rm \
-		-e WORKSPACE=/usr/src/geowave \
-		-e BUILD_ARGS="$build_args" \
-		-e MAVEN_OPTS="-Xmx1500m" \
-		-e LOCAL_USER_ID="$(whoami)" \
-		-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
-		ngageoint/geowave-centos6-java8-build \
-		/bin/bash -c \
-		"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
+	cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD
+	
+	#docker run --rm \
+	#	-e WORKSPACE=/usr/src/geowave \
+	#	-e BUILD_ARGS="$build_args" \
+	#	-e MAVEN_OPTS="-Xmx1500m" \
+	#	-e LOCAL_USER_ID="$(whoami)" \
+	#	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+	#	ngageoint/geowave-centos6-java8-build \
+	#	/bin/bash -c \
+	#	"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
 
 	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
