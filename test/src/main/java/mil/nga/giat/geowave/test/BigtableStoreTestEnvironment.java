@@ -110,7 +110,6 @@ public class BigtableStoreTestEnvironment extends
 	@Override
 	public TestEnvironment[] getDependentEnvironments() {
 		return new TestEnvironment[] {
-			ZookeeperTestEnvironment.getInstance()
 		};
 	}
 }
