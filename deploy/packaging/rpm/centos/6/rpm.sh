@@ -45,7 +45,6 @@ case ${ARGS[command]} in
         update_artifact $ARTIFACT_05_URL;
         update_artifact $ARTIFACT_06_URL;
         update_artifact $ARTIFACT_07_URL;
-        update_artifact $ARTIFACT_08_URL;
-        update_artifact $ARTIFACT_09_URL geoserver.zip; ;;
+        update_artifact $ARTIFACT_08_URL geoserver.zip; ;;
         *) about ;;
 esac
