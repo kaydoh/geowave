@@ -9,23 +9,21 @@ echo "---------------------------------------------------------------"
 echo "BUILD_ARGS=${BUILD_ARGS} ${@}"
 echo "---------------------------------------------------------------"
 
-cd $WORKSPACE/deploy
-
 # Throughout the build, capture jace artifacts to support testing
 mkdir -p $WORKSPACE/deploy/target/geowave-jace/bin
 
 # Build each of the "fat jar" artifacts and rename to remove any version strings in the file name
 
-mvn package -P geotools-container-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P geotools-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-geoserver-singlejar.jar $WORKSPACE/deploy/target/geowave-geoserver.jar
 
-mvn package -P accumulo-container-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P accumulo-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-accumulo-singlejar.jar $WORKSPACE/deploy/target/geowave-accumulo.jar
 
-mvn package -P hbase-container-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P hbase-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-hbase-singlejar.jar $WORKSPACE/deploy/target/geowave-hbase.jar
 
-mvn package -P geowave-tools-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P geowave-tools-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-tools.jar $WORKSPACE/deploy/target/geowave-tools.jar
 
 # Copy the tools fat jar

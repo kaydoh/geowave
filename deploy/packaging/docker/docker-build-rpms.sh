@@ -4,7 +4,7 @@
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SKIP_TESTS="-Dfindbugs.skip -Dformatter.skip -DskipTests"
+SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
@@ -24,7 +24,7 @@ else
     )
 fi
 
-export MVN_PACKAGE_FAT_JARS_CMD="/usr/src/geowave/deploy/packaging/rpm/admin-scripts/jenkins-build-geowave.sh $SKIP_TESTS"
+export MVN_PACKAGE_FAT_JARS_CMD="/usr/src/geowave/deploy/packaging/rpm/admin-scripts/jenkins-build-geowave.sh $SKIP_EXTRA"
 mkdir $DOCKER_ROOT
 
 $WORKSPACE/deploy/packaging/docker/pull-s3-caches.sh $DOCKER_ROOT
@@ -33,7 +33,6 @@ $WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command clean
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
 	export BUILD_ARGS="$build_args"
-	export MVN_BUILD_AND_TEST_CMD="mvn install $SKIP_TESTS $BUILD_ARGS"
 
 	docker run --rm \
 		-e WORKSPACE=/usr/src/geowave \
@@ -43,7 +42,7 @@ do
 		-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
 		ngageoint/geowave-centos6-java8-build \
 		/bin/bash -c \
-		"cd \$WORKSPACE && $MVN_BUILD_AND_TEST_CMD && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
+		"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
 
 	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
