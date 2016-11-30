@@ -31,8 +31,8 @@ cp $WORKSPACE/deploy/target/geowave-tools.jar $WORKSPACE/deploy/target/geowave-j
 
 # Run the Jace hack
 cd $WORKSPACE
-chmod +x $WORKSPACE/.utility/maven-jace-hack.sh
-$WORKSPACE/.utility/maven-jace-hack.sh
+chmod +x $WORKSPACE/deploy/packaging/rpm/admin-scripts/maven-jace-hack.sh
+$WORKSPACE/deploy/packaging/rpm/admin-scripts/maven-jace-hack.sh $BUILD_ARGS
 
 cd $WORKSPACE/deploy
 # Build the jace bindings

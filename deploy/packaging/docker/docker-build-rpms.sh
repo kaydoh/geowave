@@ -44,7 +44,7 @@ do
 	#	/bin/bash -c \
 	#	"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
 
-	docker run --rm \
+#	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
 		-e LOCAL_USER_ID="$(whoami)" \
