@@ -50,4 +50,3 @@ do
     	/bin/bash -c \
     	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh"
 done
-sudo chown -R $(whoami) $WORKSPACE/deploy/packaging
