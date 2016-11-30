@@ -14,16 +14,16 @@ mkdir -p $WORKSPACE/deploy/target/geowave-jace/bin
 
 # Build each of the "fat jar" artifacts and rename to remove any version strings in the file name
 
-mvn package -am -pl deploy -P geotools-container-singlejar $BUILD_ARGS "$@"
+/tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P geotools-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-geoserver-singlejar.jar $WORKSPACE/deploy/target/geowave-geoserver.jar
 
-mvn package -am -pl deploy -P accumulo-container-singlejar $BUILD_ARGS "$@"
+/tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P accumulo-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-accumulo-singlejar.jar $WORKSPACE/deploy/target/geowave-accumulo.jar
 
-mvn package -am -pl deploy -P hbase-container-singlejar $BUILD_ARGS "$@"
+/tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P hbase-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-hbase-singlejar.jar $WORKSPACE/deploy/target/geowave-hbase.jar
 
-mvn package -am -pl deploy -P geowave-tools-singlejar $BUILD_ARGS "$@"
+/tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P geowave-tools-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-tools.jar $WORKSPACE/deploy/target/geowave-tools.jar
 
 # Copy the tools fat jar
@@ -37,7 +37,7 @@ $WORKSPACE/.utility/maven-jace-hack.sh
 cd $WORKSPACE/deploy
 # Build the jace bindings
 if [ ! -f $WORKSPACE/deploy/target/jace-source.tar.gz ]; then
-    mvn package -P generate-geowave-jace $BUILD_ARGS "$@"
+    /tmp/apache-maven-3.2.2/bin/mvn package -P -am -pl deploy generate-geowave-jace $BUILD_ARGS "$@"
     mv $WORKSPACE/deploy/target/geowave-deploy*-jace.jar $WORKSPACE/deploy/target/geowave-jace/bin/geowave-runtime.jar
     cp $WORKSPACE/deploy/jace/CMakeLists.txt $WORKSPACE/deploy/target/geowave-jace
     cp -R $WORKSPACE/deploy/target/dependency/jace/source $WORKSPACE/deploy/target/geowave-jace
@@ -48,8 +48,8 @@ fi
 # Build and archive HTML/PDF docs
 cd $WORKSPACE/
 if [ ! -f $WORKSPACE/target/site.tar.gz ]; then
-    mvn javadoc:aggregate
-    mvn -P docs -pl docs install
+    /tmp/apache-maven-3.2.2/bin/mvn javadoc:aggregate
+    /tmp/apache-maven-3.2.2/bin/mvn -P docs -pl docs install
     tar -czf $WORKSPACE/target/site.tar.gz -C $WORKSPACE/target site
 fi
 
