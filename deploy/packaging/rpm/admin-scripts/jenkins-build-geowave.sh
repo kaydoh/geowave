@@ -31,13 +31,13 @@ cp $WORKSPACE/deploy/target/geowave-tools.jar $WORKSPACE/deploy/target/geowave-j
 
 # Run the Jace hack
 cd $WORKSPACE
-chmod +x $WORKSPACE/deploy/packaging/rpm/admin-scripts/maven-jace-hack.sh
-$WORKSPACE/deploy/packaging/rpm/admin-scripts/maven-jace-hack.sh $BUILD_ARGS
+chmod +x $WORKSPACE/deploy/packaging/rpm/admin-scripts/install-jace.sh
+$WORKSPACE/deploy/packaging/rpm/admin-scripts/install-jace.sh $BUILD_ARGS
 
 cd $WORKSPACE/deploy
 # Build the jace bindings
 if [ ! -f $WORKSPACE/deploy/target/jace-source.tar.gz ]; then
-    /tmp/apache-maven-3.2.2/bin/mvn package -P -am -pl deploy generate-geowave-jace $BUILD_ARGS "$@"
+    /tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P generate-geowave-jace $BUILD_ARGS "$@"
     mv $WORKSPACE/deploy/target/geowave-deploy*-jace.jar $WORKSPACE/deploy/target/geowave-jace/bin/geowave-runtime.jar
     cp $WORKSPACE/deploy/jace/CMakeLists.txt $WORKSPACE/deploy/target/geowave-jace
     cp -R $WORKSPACE/deploy/target/dependency/jace/source $WORKSPACE/deploy/target/geowave-jace
