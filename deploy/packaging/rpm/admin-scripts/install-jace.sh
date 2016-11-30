@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ ! -f ~/.m2/repository/com/googlecode/jace/jace-maven-plugin/1.3.0/jace-maven-plugin-1.3.0.jar ]
-then
+#f [ ! -f ~/.m2/repository/com/googlecode/jace/jace-maven-plugin/1.3.0/jace-maven-plugin-1.3.0.jar ]
+#then
     if [ -d jace-maven-plugin ]
     then
         rm -rf jace-maven-plugin
@@ -11,6 +11,6 @@ then
     git clone https://github.com/jwomeara/jace.git;
     cd jace;
     git checkout tags/v1.3.0;
-    /tmp/apache-maven-3.2.2/bin/mvn -q clean install -Dsources $BUILD_ARGS;
+    /tmp/apache-maven-3.2.2/bin/mvn -q clean install -Dsources $BUILD_ARGS "$@"
     cd ../..;
-fi 
+#fi 
