@@ -7,7 +7,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
-SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests -Dmaven.repo.local=$WORKSPACE/.m2"
+SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 # selinux config if needed
 type getenforce >/dev/null 2>&1 && getenforce >/dev/null 2>&1 && chcon -Rt svirt_sandbox_file_t $WORKSPACE;
 
@@ -32,24 +32,23 @@ $WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command clean
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
 	export BUILD_ARGS="$build_args"
-	$WORKSPACE/deploy/packaging/rpm/admin-scripts/jenkins-build-geowave.sh $SKIP_EXTRA
 	
-	#docker run --rm \
-	#	-e WORKSPACE=/usr/src/geowave \
-	#	-e BUILD_ARGS="$build_args" \
-	#	-e MAVEN_OPTS="-Xmx1500m" \
-	#	-e LOCAL_USER_ID="$(whoami)" \
-	#	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
-	#	ngageoint/geowave-centos6-java8-build \
-	#	/bin/bash -c \
-	#	"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
+	docker run --rm \
+		-e WORKSPACE=/usr/src/geowave \
+		-e BUILD_ARGS="$build_args" \
+		-e MAVEN_OPTS="-Xmx1500m" \
+		-e LOCAL_USER_ID="$(whoami)" \
+		-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+		ngageoint/geowave-centos6-java8-build \
+		/bin/bash -c \
+		"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
 
-#	docker run --rm \
-#    	-e WORKSPACE=/usr/src/geowave \
-#    	-e BUILD_ARGS="$build_args" \
-#		-e LOCAL_USER_ID="$(whoami)" \
-#    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
-#    	ngageoint/geowave-centos6-rpm-build \
-#    	/bin/bash -c \
-#    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh && chown -R $LOCAL_USER_ID $WORKSPACE/deploy/packaging"
+	docker run --rm \
+    	-e WORKSPACE=/usr/src/geowave \
+    	-e BUILD_ARGS="$build_args" \
+		-e LOCAL_USER_ID="$(whoami)" \
+    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    	ngageoint/geowave-centos6-rpm-build \
+    	/bin/bash -c \
+    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh && chown -R $LOCAL_USER_ID $WORKSPACE/deploy/packaging"
 done

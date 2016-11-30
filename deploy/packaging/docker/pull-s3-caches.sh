@@ -4,7 +4,7 @@
 # pull a cache from S3 so the first run won't take forever
 if [ -z $NO_MAVEN_INIT ] && [ ! -d $1/.m2 ]; then
 	echo "Downloading Maven Cache ..."
-	MVN_CACHE_BASE=https://s3.amazonaws.com/geowave-maven/cache-bundle
+	MVN_CACHE_BASE=https://s3.amazonaws.com/geowave-deploy/cache-bundle
 	CACHE_FILE=mvn-repo-cache-20161129.tar
 	pushd $1
 	curl -O $MVN_CACHE_BASE/$CACHE_FILE

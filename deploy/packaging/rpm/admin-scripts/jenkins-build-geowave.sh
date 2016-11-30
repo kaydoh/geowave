@@ -14,19 +14,16 @@ mkdir -p $WORKSPACE/deploy/target/geowave-jace/bin
 
 # Build each of the "fat jar" artifacts and rename to remove any version strings in the file name
 
-/tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P geotools-container-singlejar $BUILD_ARGS "$@"
-echo /tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P geotools-container-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P geotools-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-geoserver-singlejar.jar $WORKSPACE/deploy/target/geowave-geoserver.jar
 
-/tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P accumulo-container-singlejar $BUILD_ARGS "$@"
-echo /tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P accumulo-container-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P accumulo-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-accumulo-singlejar.jar $WORKSPACE/deploy/target/geowave-accumulo.jar
 
-/tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P hbase-container-singlejar $BUILD_ARGS "$@"
-echo /tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P hbase-container-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P hbase-container-singlejar $BUILD_ARGS "$@"
 mv $WORKSPACE/deploy/target/*-hbase-singlejar.jar $WORKSPACE/deploy/target/geowave-hbase.jar
 
-/tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P geowave-tools-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P geowave-tools-singlejar $BUILD_ARGS "$@"
 
 # Copy the tools fat jar
 cp $WORKSPACE/deploy/target/geowave-tools.jar $WORKSPACE/deploy/target/geowave-jace/bin/geowave-tools.jar
@@ -39,7 +36,7 @@ $WORKSPACE/deploy/packaging/rpm/admin-scripts/install-jace.sh $BUILD_ARGS "$@"
 cd $WORKSPACE
 # Build the jace bindings
 if [ ! -f $WORKSPACE/deploy/target/jace-source.tar.gz ]; then
-    /tmp/apache-maven-3.2.2/bin/mvn package -am -pl deploy -P generate-geowave-jace $BUILD_ARGS "$@"
+    mvn package -am -pl deploy -P generate-geowave-jace $BUILD_ARGS "$@"
     mv $WORKSPACE/deploy/target/geowave-deploy*-jace.jar $WORKSPACE/deploy/target/geowave-jace/bin/geowave-runtime.jar
     cp $WORKSPACE/deploy/jace/CMakeLists.txt $WORKSPACE/deploy/target/geowave-jace
     cp -R $WORKSPACE/deploy/target/dependency/jace/source $WORKSPACE/deploy/target/geowave-jace
@@ -49,8 +46,8 @@ fi
 
 # Build and archive HTML/PDF docs
 if [ ! -f $WORKSPACE/target/site.tar.gz ]; then
-    /tmp/apache-maven-3.2.2/bin/mvn javadoc:aggregate $BUILD_ARGS "$@"
-    /tmp/apache-maven-3.2.2/bin/mvn -P docs -pl docs install $BUILD_ARGS "$@"
+    mvn javadoc:aggregate $BUILD_ARGS "$@"
+    mvn -P docs -pl docs install $BUILD_ARGS "$@"
     tar -czf $WORKSPACE/target/site.tar.gz -C $WORKSPACE/target site
 fi
 

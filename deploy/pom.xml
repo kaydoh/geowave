@@ -306,16 +306,8 @@
 			<properties>
 				<geotools.scope>provided</geotools.scope>
 				<container.extension>-geotools-container</container.extension>
+				<hbase.version>1.2.3</hbase.version>
 			</properties>
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<groupId>com.google.guava</groupId>
-						<artifactId>guava</artifactId>
-						<version>16.0</version>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
 			<build>
 				<plugins>
 					<plugin>
@@ -345,6 +337,7 @@
 			<properties>
 				<geotools.scope>provided</geotools.scope>
 				<container.extension>-geotools-container</container.extension>
+				<hbase.version>1.2.3</hbase.version>
 			</properties>
 			<dependencyManagement>
 				<dependencies>
@@ -377,8 +370,8 @@
 											<exclude>commons-codec:commons-codec</exclude>
 
 											<!-- the required version of guava should exist in geoserver's 
-												classpath, although in order to get guava's StopWatch working with HBase 1.2.x we need no later than guava 16.0<exclude>com.google.guava:guava</exclude> -->
-
+												classpath, although in order to get guava's StopWatch working with HBase 1.2.x we need no later than guava 16.0 -->
+											<exclude>com.google.guava:guava</exclude>
 											<!-- even though commons-lang should exist in geoserver's classpath 
 												it is version 2.1 which is missing necessary classes, <exclude>*:commons-lang:*</exclude> -->
 
