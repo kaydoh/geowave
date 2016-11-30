@@ -37,16 +37,18 @@ do
 		-e WORKSPACE=/usr/src/geowave \
 		-e BUILD_ARGS="$build_args" \
 		-e MAVEN_OPTS="-Xmx1500m" \
+		-e LOCAL_USER_ID=`$(whoami)` \ 
 		-v $HOME:/root -v $WORKSPACE:/usr/src/geowave \
 		ngageoint/geowave-centos6-java8-build \
 		/bin/bash -c \
-		"cd \$WORKSPACE && $MVN_BUILD_AND_TEST_CMD && $MVN_PACKAGE_FAT_JARS_CMD"
+		"cd \$WORKSPACE && $MVN_BUILD_AND_TEST_CMD && $MVN_PACKAGE_FAT_JARS_CMD && chown -R $LOCAL_USER_ID $WORKSPACE"
 
 	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
+		-e LOCAL_USER_ID=`$(whoami)` \ 
     	-v $WORKSPACE:/usr/src/geowave \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
-    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh"
+    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh && chown -R $LOCAL_USER_ID $WORKSPACE/deploy/packaging"
 done
