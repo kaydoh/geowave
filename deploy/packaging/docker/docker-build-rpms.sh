@@ -4,11 +4,10 @@
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests -Dmaven.repo.local=$WORKSPACE/.m2"
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
-
+SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests -Dmaven.repo.local=$WORKSPACE/.m2"
 # selinux config if needed
 type getenforce >/dev/null 2>&1 && getenforce >/dev/null 2>&1 && chcon -Rt svirt_sandbox_file_t $WORKSPACE;
 
@@ -33,7 +32,7 @@ $WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command clean
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
 	export BUILD_ARGS="$build_args"
-	cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD
+	/usr/src/geowave/deploy/packaging/rpm/admin-scripts/jenkins-build-geowave.sh $SKIP_EXTRA
 	
 	#docker run --rm \
 	#	-e WORKSPACE=/usr/src/geowave \
