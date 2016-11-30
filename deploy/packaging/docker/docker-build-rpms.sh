@@ -33,7 +33,7 @@ do
 	export BUILD_ARGS="$build_args"
 	export MVN_BUILD_AND_TEST_CMD="mvn install $SKIP_TESTS $BUILD_ARGS"
 
-	sudo docker run --rm \
+	docker run --rm \
 		-e WORKSPACE=/usr/src/geowave \
 		-e BUILD_ARGS="$build_args" \
 		-e MAVEN_OPTS="-Xmx1500m" \
@@ -42,7 +42,7 @@ do
 		/bin/bash -c \
 		"cd \$WORKSPACE && $MVN_BUILD_AND_TEST_CMD && $MVN_PACKAGE_FAT_JARS_CMD"
 
-	sudo docker run --rm \
+	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
     	-v $WORKSPACE:/usr/src/geowave \
