@@ -130,16 +130,16 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 		}
 
 		try {
-			testQuery(
-					new File(
-							TEST_POLYGON_TEMPORAL_FILTER_FILE).toURI().toURL(),
-					new URL[] {
-						new File(
-								HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() /*,
-						new File(
-								TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() */
-					},
-					"polygon constraint and time range");
+//			testQuery(
+//					new File(
+//							TEST_POLYGON_TEMPORAL_FILTER_FILE).toURI().toURL(),
+//					new URL[] {
+//						new File(
+//								HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() /*,
+//						new File(
+//								TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() */
+//					},
+//					"polygon constraint and time range");
 		}
 		catch (final Exception e) {
 			e.printStackTrace();
