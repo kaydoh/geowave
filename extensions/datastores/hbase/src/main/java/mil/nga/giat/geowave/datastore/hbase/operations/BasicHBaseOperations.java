@@ -53,6 +53,7 @@ public class BasicHBaseOperations implements
 			Configuration config = BigtableConfiguration.configure(projectId, instanceId);
 			
 			// TODO: Bigtable configgy things? What about connection pooling?
+			config.setBoolean("hbase.online.schema.update.enable", true);
 			
 			conn = BigtableConfiguration.connect(config);
 		}
