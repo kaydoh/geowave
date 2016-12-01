@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#f [ ! -f ~/.m2/repository/com/googlecode/jace/jace-maven-plugin/1.3.0/jace-maven-plugin-1.3.0.jar ]
-#then
+if [ ! -f ~/.m2/repository/com/googlecode/jace/jace-maven-plugin/1.3.0/jace-maven-plugin-1.3.0.jar ]
+then
     if [ -d jace-maven-plugin ]
     then
         rm -rf jace-maven-plugin
@@ -13,4 +13,4 @@
     git checkout tags/v1.3.0;
     mvn -q clean install -Dsources "$@"
     cd ../..;
-#fi 
+fi 

@@ -14,16 +14,13 @@ mkdir -p $WORKSPACE/deploy/target/geowave-jace/bin
 
 # Build each of the "fat jar" artifacts and rename to remove any version strings in the file name
 
-mvn package -am -pl deploy -P geotools-container-singlejar $BUILD_ARGS "$@"
-mv $WORKSPACE/deploy/target/*-geoserver-singlejar.jar $WORKSPACE/deploy/target/geowave-geoserver.jar
+mvn package -am -pl deploy -P geotools-container-singlejar -Dgeotools.finalName=geowave-geoserver $BUILD_ARGS "$@"
 
-mvn package -am -pl deploy -P accumulo-container-singlejar $BUILD_ARGS "$@"
-mv $WORKSPACE/deploy/target/*-accumulo-singlejar.jar $WORKSPACE/deploy/target/geowave-accumulo.jar
+mvn package -am -pl deploy -P accumulo-container-singlejar -Daccumulo.finalName=geowave-accumulo $BUILD_ARGS "$@"
 
-mvn package -am -pl deploy -P hbase-container-singlejar $BUILD_ARGS "$@"
-mv $WORKSPACE/deploy/target/*-hbase-singlejar.jar $WORKSPACE/deploy/target/geowave-hbase.jar
+mvn package -am -pl deploy -P hbase-container-singlejar -Dhbase.finalName=geowave-hbase $BUILD_ARGS "$@"
 
-mvn package -am -pl deploy -P geowave-tools-singlejar $BUILD_ARGS "$@"
+mvn package -am -pl deploy -P geowave-tools-singlejar -Dtools.finalName=geowave-tools $BUILD_ARGS "$@"
 
 # Copy the tools fat jar
 cp $WORKSPACE/deploy/target/geowave-tools.jar $WORKSPACE/deploy/target/geowave-jace/bin/geowave-tools.jar

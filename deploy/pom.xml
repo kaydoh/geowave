@@ -10,6 +10,10 @@
 	<artifactId>geowave-deploy</artifactId>
 	<name>GeoWave Deployment Configurations</name>
 	<properties>
+		<tools.finalName>${project.artifactId}-${project.version}-tools</tools.finalName>
+		<hbase.finalName>${project.artifactId}-${project.version}-hbase</hbase.finalName>
+		<accumulo.finalName>${project.artifactId}-${project.version}-accumulo</accumulo.finalName>
+		<geotools.finalName>${project.artifactId}-${project.version}-geotools</geotools.finalName>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<BUILD_SHARED_LIBS>ON</BUILD_SHARED_LIBS>
@@ -234,13 +238,6 @@
 			</build>
 		</profile>
 		<profile>
-			<id>hbase-container</id>
-			<properties>
-				<hbase.scope>provided</hbase.scope>
-				<container.extension>-hbase-container</container.extension>
-			</properties>
-		</profile>
-		<profile>
 			<id>accumulo-container</id>
 			<properties>
 				<accumulo.scope>provided</accumulo.scope>
@@ -295,7 +292,7 @@
 							<descriptors>
 								<descriptor>src/main/assembly/assembly${container.extension}.xml</descriptor>
 							</descriptors>
-							<finalName>${project.build.finalName}${container.extension}</finalName>
+							<finalName>${accumulo.finalName}</finalName>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -324,7 +321,7 @@
 									<descriptors>
 										<descriptor>src/main/assembly/assembly${container.extension}.xml</descriptor>
 									</descriptors>
-									<finalName>${project.build.finalName}${container.extension}</finalName>
+									<finalName>${geotools.finalName}</finalName>
 								</configuration>
 							</execution>
 						</executions>
@@ -449,7 +446,7 @@
 									</transformers>
 									<createDependencyReducedPom>false</createDependencyReducedPom>
 									<minimizeJar>false</minimizeJar>
-									<finalName>${project.build.finalName}-geoserver-singlejar</finalName>
+									<finalName>${geotools.finalName}</finalName>
 								</configuration>
 							</execution>
 						</executions>
@@ -539,7 +536,7 @@
 									</transformers>
 									<createDependencyReducedPom>false</createDependencyReducedPom>
 									<minimizeJar>false</minimizeJar>
-									<finalName>${project.build.finalName}-accumulo-singlejar</finalName>
+									<finalName>${accumulo.finalName}</finalName>
 								</configuration>
 							</execution>
 						</executions>
@@ -586,7 +583,7 @@
 									</transformers>
 									<createDependencyReducedPom>false</createDependencyReducedPom>
 									<minimizeJar>false</minimizeJar>
-									<finalName>${project.build.finalName}-hbase-singlejar</finalName>
+									<finalName>${hbase.finalName}</finalName>
 								</configuration>
 							</execution>
 						</executions>

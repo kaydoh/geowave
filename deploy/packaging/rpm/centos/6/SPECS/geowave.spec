@@ -28,7 +28,7 @@ Version:        %{version}
 Release:        %{timestamp}
 BuildRoot:      %{buildroot}
 BuildArch:      noarch
-Summary:        GeoWave provides geospatial and temporal indexing on top of Accumulo
+Summary:        GeoWave provides geospatial and temporal indexing on top of Accumulo and HBase
 License:        Apache2
 Group:          Applications/Internet
 Source0:        geowave-accumulo.jar
