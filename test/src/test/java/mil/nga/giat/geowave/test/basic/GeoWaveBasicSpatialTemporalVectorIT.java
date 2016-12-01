@@ -46,10 +46,10 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 			+ "hail-box-temporal-filter.shp";
 	private static final String HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE = HAIL_TEST_CASE_PACKAGE
 			+ "hail-polygon-temporal-filter.shp";
-	private static final String TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE = TORNADO_TRACKS_TEST_CASE_PACKAGE
-			+ "tornado_tracks-box-temporal-filter.shp";
-	private static final String TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE = TORNADO_TRACKS_TEST_CASE_PACKAGE
-			+ "tornado_tracks-polygon-temporal-filter.shp";
+//	private static final String TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE = TORNADO_TRACKS_TEST_CASE_PACKAGE
+//			+ "tornado_tracks-box-temporal-filter.shp";
+//	private static final String TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE = TORNADO_TRACKS_TEST_CASE_PACKAGE
+//			+ "tornado_tracks-polygon-temporal-filter.shp";
 	private static final String TEST_BOX_TEMPORAL_FILTER_FILE = TEST_FILTER_PACKAGE + "Box-Temporal-Filter.shp";
 	private static final String TEST_POLYGON_TEMPORAL_FILTER_FILE = TEST_FILTER_PACKAGE + "Polygon-Temporal-Filter.shp";
 	private static final String TEST_EXPORT_DIRECTORY = "export";
@@ -104,11 +104,11 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 				HAIL_SHAPEFILE_FILE,
 				1);
 
-		TestUtils.testLocalIngest(
-				dataStore,
-				DimensionalityType.SPATIAL_TEMPORAL,
-				TORNADO_TRACKS_SHAPEFILE_FILE,
-				1);
+//		TestUtils.testLocalIngest(
+//				dataStore,
+//				DimensionalityType.SPATIAL_TEMPORAL,
+//				TORNADO_TRACKS_SHAPEFILE_FILE,
+//				1);
 
 		try {
 			testQuery(
@@ -116,9 +116,9 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 							TEST_BOX_TEMPORAL_FILTER_FILE).toURI().toURL(),
 					new URL[] {
 						new File(
-								HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
+								HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() /*,
 						new File(
-								TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()
+								TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() */
 					},
 					"bounding box and time range");
 		}
@@ -135,9 +135,9 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 							TEST_POLYGON_TEMPORAL_FILTER_FILE).toURI().toURL(),
 					new URL[] {
 						new File(
-								HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
+								HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() /*,
 						new File(
-								TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()
+								TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() */
 					},
 					"polygon constraint and time range");
 		}
@@ -295,9 +295,9 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 							TEST_BOX_TEMPORAL_FILTER_FILE).toURI().toURL(),
 					new URL[] {
 						new File(
-								HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
+								HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() /*,
 						new File(
-								TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()
+								TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL() */
 					},
 					"reingested bounding box and time range");
 		}

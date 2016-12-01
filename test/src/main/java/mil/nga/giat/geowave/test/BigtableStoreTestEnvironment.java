@@ -42,6 +42,8 @@ public class BigtableStoreTestEnvironment extends
 				false);
 		hbaseOptions.setEnableCoprocessors(
 				false);
+		
+		((HBaseRequiredOptions) options).setZookeeper(zookeeper);
 	}
 
 	@Override
