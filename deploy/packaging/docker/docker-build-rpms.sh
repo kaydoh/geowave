@@ -8,6 +8,7 @@ cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
 SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
+GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
 # selinux config if needed
 type getenforce >/dev/null 2>&1 && getenforce >/dev/null 2>&1 && chcon -Rt svirt_sandbox_file_t $WORKSPACE;
 
@@ -47,6 +48,7 @@ do
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
 		-e LOCAL_USER_ID="$(whoami)" \
+		-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
     	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
