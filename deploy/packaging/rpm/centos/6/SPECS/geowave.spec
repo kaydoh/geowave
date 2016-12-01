@@ -47,7 +47,6 @@ Source12:       geowave-tools.jar
 Source13:       site.tar.gz
 Source14:       puppet-scripts.tar.gz
 Source15:       manpages.tar.gz
-Source16:       plugins.tar.gz
 BuildRequires:  unzip
 BuildRequires:  zip
 BuildRequires:  xmlto
@@ -122,7 +121,6 @@ zip -qg %{buildroot}%{geowave_tools_home}/geowave-tools.jar build.properties
 popd
 mv %{buildroot}%{geowave_tools_home}/build.properties %{buildroot}%{geowave_tools_home}/geowave-tools-build.properties
 unzip -p %{SOURCE12} geowave-tools.sh > %{buildroot}%{geowave_tools_home}/geowave-tools.sh
-tar xzf %{SOURCE16} -C %{buildroot}%{geowave_plugins_home}
 
 # Copy documentation into place
 mkdir -p %{buildroot}%{geowave_docs_home}
