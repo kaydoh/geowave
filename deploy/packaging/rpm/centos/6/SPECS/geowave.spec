@@ -75,6 +75,7 @@ mkdir -p %{buildroot}%{geowave_accumulo_home}
 
 # Copy Accumulo library and deployment script onto local file system
 cp %{SOURCE0} %{SOURCE1} %{buildroot}%{geowave_accumulo_home}
+cp %{SOURCE2} %{SOURCE3} %{buildroot}%{geowave_hbase_home}
 
 # Extract version info file for easy inspection
 unzip -p %{SOURCE0} build.properties > %{buildroot}%{geowave_accumulo_home}/geowave-accumulo-build.properties
