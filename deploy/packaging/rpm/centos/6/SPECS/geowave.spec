@@ -54,7 +54,7 @@ BuildRequires:  xmlto
 BuildRequires:  asciidoc
 
 %description
-GeoWave provides geospatial and temporal indexing on top of Accumulo.
+GeoWave provides geospatial and temporal indexing on top of Accumulo and HBase.
 
 %prep
 rm -rf %{_rpmdir}/%{buildarch}/%{versioned_app_name}*
@@ -72,6 +72,7 @@ rm -fr %{_builddir}/*
 rm -fr %{buildroot}
 mkdir -p %{buildroot}%{geowave_config}
 mkdir -p %{buildroot}%{geowave_accumulo_home}
+mkdir -p %{buildroot}%{geowave_hbase_home}
 
 # Copy Accumulo library and deployment script onto local file system
 cp %{SOURCE0} %{SOURCE1} %{buildroot}%{geowave_accumulo_home}
