@@ -23,13 +23,17 @@ public abstract class StoreTestEnvironment implements
 		final DataStorePluginOptions pluginOptions = new DataStorePluginOptions();
 		final GenericStoreFactory<DataStore> factory = getDataStoreFactory();
 		StoreFactoryOptions opts = factory.createOptionsInstance();
-		initOptions(opts);
-		opts.setGeowaveNamespace(store.namespace());
+		initOptions(
+				opts);
+		opts.setGeowaveNamespace(
+				store.namespace());
 		final Map<String, String> optionOverrides = new HashMap<>();
 		// now allow for overrides to take precedence
 		for (final String optionOverride : store.options()) {
-			if (optionOverride.contains("=")) {
-				final String[] kv = optionOverride.split("=");
+			if (optionOverride.contains(
+					"=")) {
+				final String[] kv = optionOverride.split(
+						"=");
 				optionOverrides.put(
 						kv[0],
 						kv[1]);
@@ -41,8 +45,10 @@ public abstract class StoreTestEnvironment implements
 					optionOverrides);
 		}
 
-		pluginOptions.selectPlugin(factory.getName());
-		pluginOptions.setFactoryOptions(opts);
+		pluginOptions.selectPlugin(
+				factory.getName());
+		pluginOptions.setFactoryOptions(
+				opts);
 		return pluginOptions;
 	}
 }

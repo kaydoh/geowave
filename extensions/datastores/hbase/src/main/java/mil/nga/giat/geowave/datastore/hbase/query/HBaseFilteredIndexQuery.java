@@ -48,8 +48,7 @@ public abstract class HBaseFilteredIndexQuery extends
 
 	protected final ScanCallback<?> scanCallback;
 	protected List<QueryFilter> clientFilters;
-	private final static Logger LOGGER = Logger.getLogger(
-			HBaseFilteredIndexQuery.class);
+	private final static Logger LOGGER = Logger.getLogger(HBaseFilteredIndexQuery.class);
 	private boolean hasSkippingFilter = false;
 
 	public HBaseFilteredIndexQuery(
@@ -114,38 +113,29 @@ public abstract class HBaseFilteredIndexQuery extends
 			final Integer limit,
 			final boolean decodePersistenceEncoding ) {
 		try {
-			if (!validateAdapters(
-					operations)) {
-				LOGGER.warn(
-						"Query contains no valid adapters.");
+			if (!validateAdapters(operations)) {
+				LOGGER.warn("Query contains no valid adapters.");
 				return new CloseableIterator.Empty();
 			}
-			if (!operations.tableExists(
-					StringUtils.stringFromBinary(
-							index.getId().getBytes()))) {
-				LOGGER.warn(
-						"Table does not exist " + StringUtils.stringFromBinary(
-								index.getId().getBytes()));
+			if (!operations.tableExists(StringUtils.stringFromBinary(index.getId().getBytes()))) {
+				LOGGER.warn("Table does not exist " + StringUtils.stringFromBinary(index.getId().getBytes()));
 				return new CloseableIterator.Empty();
 			}
 		}
 		catch (final IOException ex) {
 			LOGGER.warn(
-					"Unabe to check if " + StringUtils.stringFromBinary(
-							index.getId().getBytes()) + " table exists",
+					"Unabe to check if " + StringUtils.stringFromBinary(index.getId().getBytes()) + " table exists",
 					ex);
 			return new CloseableIterator.Empty();
 		}
 
-		final String tableName = StringUtils.stringFromBinary(
-				index.getId().getBytes());
+		final String tableName = StringUtils.stringFromBinary(index.getId().getBytes());
 
 		final List<Iterator<Result>> resultsIterators = new ArrayList<Iterator<Result>>();
 		final List<ResultScanner> results = new ArrayList<ResultScanner>();
 
 		if (isBigtable()) {
-			final List<Scan> scanners = getScannerList(
-					limit);
+			final List<Scan> scanners = getScannerList(limit);
 
 			for (final Scan scanner : scanners) {
 				try {
@@ -155,18 +145,15 @@ public abstract class HBaseFilteredIndexQuery extends
 							authorizations);
 
 					if (rs != null) {
-						results.add(
-								rs);
+						results.add(rs);
 						final Iterator<Result> it = rs.iterator();
 						if (it.hasNext()) {
-							resultsIterators.add(
-									it);
+							resultsIterators.add(it);
 						}
 					}
 				}
 				catch (final IOException e) {
-					LOGGER.warn(
-							"Could not get the results from scanner " + e);
+					LOGGER.warn("Could not get the results from scanner " + e);
 				}
 			}
 		}
@@ -185,10 +172,9 @@ public abstract class HBaseFilteredIndexQuery extends
 					if (maxResolutionSubsamplingPerDimension.length != index
 							.getIndexStrategy()
 							.getOrderedDimensionDefinitions().length) {
-						LOGGER.warn(
-								"Unable to subsample for table '" + tableName + "'. Subsample dimensions = "
-										+ maxResolutionSubsamplingPerDimension.length + " when indexed dimensions = "
-										+ index.getIndexStrategy().getOrderedDimensionDefinitions().length);
+						LOGGER.warn("Unable to subsample for table '" + tableName + "'. Subsample dimensions = "
+								+ maxResolutionSubsamplingPerDimension.length + " when indexed dimensions = "
+								+ index.getIndexStrategy().getOrderedDimensionDefinitions().length);
 					}
 					else {
 						final int cardinalityToSubsample = IndexUtils.getBitPositionFromSubsamplingArray(
@@ -197,8 +183,7 @@ public abstract class HBaseFilteredIndexQuery extends
 
 						final FixedCardinalitySkippingFilter skippingFilter = new FixedCardinalitySkippingFilter(
 								cardinalityToSubsample);
-						filterList.addFilter(
-								skippingFilter);
+						filterList.addFilter(skippingFilter);
 						hasSkippingFilter = true;
 					}
 				}
@@ -214,14 +199,12 @@ public abstract class HBaseFilteredIndexQuery extends
 							distFilters,
 							index.getIndexModel());
 
-					filterList.addFilter(
-							hbdFilter);
+					filterList.addFilter(hbdFilter);
 				}
 			}
 
 			if (!filterList.getFilters().isEmpty()) {
-				multiScanner.setFilter(
-						filterList);
+				multiScanner.setFilter(filterList);
 			}
 
 			try {
@@ -231,12 +214,10 @@ public abstract class HBaseFilteredIndexQuery extends
 						authorizations);
 
 				if (rs != null) {
-					results.add(
-							rs);
+					results.add(rs);
 					final Iterator<Result> it = rs.iterator();
 					if (it.hasNext()) {
-						resultsIterators.add(
-								it);
+						resultsIterators.add(it);
 					}
 				}
 			}
@@ -250,8 +231,7 @@ public abstract class HBaseFilteredIndexQuery extends
 		if (results.iterator().hasNext()) {
 			Iterator it = initIterator(
 					adapterStore,
-					Iterators.concat(
-							resultsIterators.iterator()),
+					Iterators.concat(resultsIterators.iterator()),
 					maxResolutionSubsamplingPerDimension,
 					decodePersistenceEncoding);
 
@@ -267,8 +247,7 @@ public abstract class HBaseFilteredIndexQuery extends
 					it);
 		}
 
-		LOGGER.error(
-				"Results were empty");
+		LOGGER.error("Results were empty");
 		return new CloseableIterator.Empty();
 	}
 
@@ -287,35 +266,27 @@ public abstract class HBaseFilteredIndexQuery extends
 
 		List<ByteArrayRange> ranges = getRanges();
 		if ((ranges == null) || ranges.isEmpty()) {
-			ranges = Collections.singletonList(
-					new ByteArrayRange(
-							null,
-							null));
+			ranges = Collections.singletonList(new ByteArrayRange(
+					null,
+					null));
 		}
 
 		final List<Scan> scanners = new ArrayList<Scan>();
 		if ((ranges != null) && (ranges.size() > 0)) {
 			for (final ByteArrayRange range : ranges) {
-				final Scan scanner = createStandardScanner(
-						limit);
+				final Scan scanner = createStandardScanner(limit);
 
 				if (range.getStart() != null) {
-					scanner.setStartRow(
-							range.getStart().getBytes());
+					scanner.setStartRow(range.getStart().getBytes());
 					if (!range.isSingleValue()) {
-						scanner.setStopRow(
-								HBaseUtils.getNextPrefix(
-										range.getEnd().getBytes()));
+						scanner.setStopRow(HBaseUtils.getNextPrefix(range.getEnd().getBytes()));
 					}
 					else {
-						scanner.setStopRow(
-								HBaseUtils.getNextPrefix(
-										range.getStart().getBytes()));
+						scanner.setStopRow(HBaseUtils.getNextPrefix(range.getStart().getBytes()));
 					}
 				}
 
-				scanners.add(
-						scanner);
+				scanners.add(scanner);
 			}
 		}
 
@@ -328,16 +299,13 @@ public abstract class HBaseFilteredIndexQuery extends
 			final Integer limit,
 			final double[] maxResolutionSubsamplingPerDimension ) {
 		// Single scan w/ multiple ranges
-		final Scan multiScanner = createStandardScanner(
-				limit);
+		final Scan multiScanner = createStandardScanner(limit);
 
 		final List<ByteArrayRange> ranges = getRanges();
 
-		final MultiRowRangeFilter filter = getMultiRowRangeFilter(
-				ranges);
+		final MultiRowRangeFilter filter = getMultiRowRangeFilter(ranges);
 		if (filter != null) {
-			filterList.addFilter(
-					filter);
+			filterList.addFilter(filter);
 		}
 
 		return multiScanner;
@@ -348,25 +316,20 @@ public abstract class HBaseFilteredIndexQuery extends
 		final Scan scanner = new Scan();
 
 		// Performance tuning per store options
-		scanner.setCaching(
-				getScanCacheSize());
-		scanner.setCacheBlocks(
-				isEnableBlockCache());
+		scanner.setCaching(getScanCacheSize());
+		scanner.setCacheBlocks(isEnableBlockCache());
 
 		// Only return the most recent version
-		scanner.setMaxVersions(
-				1);
+		scanner.setMaxVersions(1);
 
 		if ((adapterIds != null) && !adapterIds.isEmpty()) {
 			for (final ByteArrayId adapterId : adapterIds) {
-				scanner.addFamily(
-						adapterId.getBytes());
+				scanner.addFamily(adapterId.getBytes());
 			}
 		}
 
 		if ((limit != null) && (limit > 0) && (limit < scanner.getBatch())) {
-			scanner.setBatch(
-					limit);
+			scanner.setBatch(limit);
 		}
 
 		return scanner;
@@ -396,12 +359,11 @@ public abstract class HBaseFilteredIndexQuery extends
 		// create the multi-row filter
 		final List<RowRange> rowRanges = new ArrayList<RowRange>();
 		if ((ranges == null) || ranges.isEmpty()) {
-			rowRanges.add(
-					new RowRange(
-							HConstants.EMPTY_BYTE_ARRAY,
-							true,
-							HConstants.EMPTY_BYTE_ARRAY,
-							false));
+			rowRanges.add(new RowRange(
+					HConstants.EMPTY_BYTE_ARRAY,
+					true,
+					HConstants.EMPTY_BYTE_ARRAY,
+					false));
 		}
 		else {
 			for (final ByteArrayRange range : ranges) {
@@ -409,12 +371,10 @@ public abstract class HBaseFilteredIndexQuery extends
 					final byte[] startRow = range.getStart().getBytes();
 					byte[] stopRow;
 					if (!range.isSingleValue()) {
-						stopRow = HBaseUtils.getNextPrefix(
-								range.getEnd().getBytes());
+						stopRow = HBaseUtils.getNextPrefix(range.getEnd().getBytes());
 					}
 					else {
-						stopRow = HBaseUtils.getNextPrefix(
-								range.getStart().getBytes());
+						stopRow = HBaseUtils.getNextPrefix(range.getStart().getBytes());
 					}
 
 					final RowRange rowRange = new RowRange(
@@ -423,8 +383,7 @@ public abstract class HBaseFilteredIndexQuery extends
 							stopRow,
 							true);
 
-					rowRanges.add(
-							rowRange);
+					rowRanges.add(rowRange);
 				}
 			}
 		}
@@ -457,15 +416,13 @@ public abstract class HBaseFilteredIndexQuery extends
 		// server side filters and hence they have to run on clients itself. So
 		// need to add server side filters also in list of client filters.
 		final List<QueryFilter> filters = getAllFiltersList();
-		final QueryFilter queryFilter = filters.isEmpty() ? null : filters.size() == 1 ? filters.get(
-				0)
+		final QueryFilter queryFilter = filters.isEmpty() ? null : filters.size() == 1 ? filters.get(0)
 				: new mil.nga.giat.geowave.core.store.filter.FilterList<QueryFilter>(
 						filters);
 
 		final Map<ByteArrayId, RowMergingDataAdapter> mergingAdapters = new HashMap<ByteArrayId, RowMergingDataAdapter>();
 		for (final ByteArrayId adapterId : adapterIds) {
-			final DataAdapter adapter = adapterStore.getAdapter(
-					adapterId);
+			final DataAdapter adapter = adapterStore.getAdapter(adapterId);
 			if ((adapter instanceof RowMergingDataAdapter)
 					&& (((RowMergingDataAdapter) adapter).getTransform() != null)) {
 				mergingAdapters.put(
@@ -504,8 +461,7 @@ public abstract class HBaseFilteredIndexQuery extends
 		// This method is so that it can be overridden to also add distributed
 		// filter list
 		final List<QueryFilter> filters = new ArrayList<QueryFilter>();
-		filters.addAll(
-				clientFilters);
+		filters.addAll(clientFilters);
 		return filters;
 	}
 }

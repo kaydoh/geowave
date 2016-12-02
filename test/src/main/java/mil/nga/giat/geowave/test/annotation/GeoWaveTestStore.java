@@ -55,6 +55,5 @@ public @interface GeoWaveTestStore {
 		public StoreTestEnvironment getTestEnvironment() {
 			return testEnvironment;
 		}
-
 	}
 }

@@ -22,7 +22,7 @@ public class HBaseCommandLineOptions
 	public HBaseCommandLineOptions(
 			final String zookeepers,
 			final String namespace,
-			final boolean bigtable) {
+			final boolean bigtable ) {
 		this.zookeepers = zookeepers;
 		this.namespace = namespace;
 		this.bigtable = bigtable;
@@ -54,18 +54,18 @@ public class HBaseCommandLineOptions
 		final String namespace = commandLine.getOptionValue(
 				"n",
 				"");
-		final String bigtableStr = commandLine.getOptionValue("bigtable");		
+		final String bigtableStr = commandLine.getOptionValue("bigtable");
 		boolean bigtable = false;
 		if (bigtableStr != null) {
 			bigtable = Boolean.parseBoolean(bigtableStr);
 		}
-		
+
 		if (zookeepers == null) {
 			LOGGER.error("Zookeeper URL not set");
 			throw new ParseException(
 					"Required option is missing");
 		}
-		
+
 		return new HBaseCommandLineOptions(
 				zookeepers,
 				namespace,
