@@ -109,5 +109,4 @@ public class InputFormatHBaseRangeQuery extends
 
 		return scanner;
 	}
-
 }

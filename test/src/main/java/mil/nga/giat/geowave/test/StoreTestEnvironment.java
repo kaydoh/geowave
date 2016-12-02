@@ -45,10 +45,8 @@ public abstract class StoreTestEnvironment implements
 					optionOverrides);
 		}
 
-		pluginOptions.selectPlugin(
-				factory.getName());
-		pluginOptions.setFactoryOptions(
-				opts);
+		pluginOptions.selectPlugin(factory.getType());
+		pluginOptions.setFactoryOptions(opts);
 		return pluginOptions;
 	}
 }
