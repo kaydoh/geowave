@@ -17,10 +17,13 @@ echo "BUILD_ARGS=${BUILD_ARGS}"
 echo "VENDOR_VERSION=${VENDOR_VERSION}"
 echo "---------------------------------------------------------------"
 # Ensure mounted volume permissions are OK for access
-chown -R root:root /usr/src/geowave/deploy/packaging/rpm
+chown -R root:root $WORKSPACE/deploy/packaging/rpm
+
+# Now make sure the host can easily modify/delete generated artifacts
+cmod -R 777 $WORKSPACE/deploy/packaging/rpm
 
 # Staging Artifacts for Build
-cd /usr/src/geowave/deploy/packaging/rpm/centos/6/SOURCES
+cd $WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES
 rm -f *.gz *.jar
 cp /usr/src/geowave/target/site.tar.gz .
 cp /usr/src/geowave/docs/target/manpages.tar.gz .
@@ -29,4 +32,4 @@ cp /usr/src/geowave/deploy/target/*.tar.gz .
 cd ..
 
 # Build
-./rpm.sh --command build --vendor-version $VENDOR_VERSION
+$WORKSPACE/deploy/packaging/rpm/rpm.sh --command build --vendor-version $VENDOR_VERSION

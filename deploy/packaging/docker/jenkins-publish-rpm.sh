@@ -3,6 +3,7 @@
 # For use by rpm building jenkins jobs. Handles job race conditions and
 # reindexing the existing rpm repo
 #
+
 set -x
 
 echo '###### Build Variables'
@@ -15,26 +16,6 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
-
-echo '###### Clean up workspace'
-
-cd "${WORKSPACE}/${ARGS[buildroot]}"
-./rpm.sh --command clean
-
-echo '###### Update artifact(s)'
-
-./rpm.sh \
-    --command update \
-    --job ${ARGS[job]} \
-    --geoserver ${ARGS[geoserver]} \
-
-echo '###### Build rpm'
-
-./rpm.sh \
-    --command build \
-    --vendor-version ${ARGS[vendor-version]} \
-    --buildarg ba # ba = build all (binary and source rpms)
-
 echo '###### Build tarball distribution archive'
 
 # Copy the SRPM into an extract directory
@@ -72,10 +53,10 @@ cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-jace.tar.gz ${WORKSPACE}/${AR
 
 echo '###### Copy rpm to repo and reindex'
 
-SNAPSHOT_DIR=/var/www/html/repos/snapshots
-cp -R ${WORKSPACE}/${ARGS[buildroot]}/RPMS/${ARGS[arch]}/*.rpm ${SNAPSHOT_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
-cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SRPMS/*.rpm ${SNAPSHOT_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/SRPMS/
-cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${SNAPSHOT_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/TARBALL/
+LOCAL_REPO_DIR=/var/www/html/repos
+cp -R ${WORKSPACE}/${ARGS[buildroot]}/RPMS/${ARGS[arch]}/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
+cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SRPMS/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/SRPMS/
+cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/TARBALL/
 
 # When several processes run createrepo concurrently they will often fail with problems trying to
 # access index files that are in the process of being overwritten by the other processes. The command

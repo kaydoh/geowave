@@ -113,36 +113,6 @@ isValidUrl() {
 	[[ $1 =~ $VALID_URL_REGEX ]] && return 0 || return 1
 }
 
-update_artifact() {
-	ARTIFACT_URL="$1"	# Required, url to fetch asset
-	DOWNLOAD_NAME="$2"	# Optional, rename file upon download
-	
-	# Sanity check the URL argument
-	if ( ! isValidUrl "$ARTIFACT_URL" ); then
-		echo >&2 "Artifact URL $ARTIFACT_URL does not appear to be valid.  Aborting." 
-		if [ $TEST_ENV ]; then 
-			return 1
-		else
-			exit 1
-		fi
-	fi
-
-	# Construct the download command
-	if [ $DOWNLOAD_NAME ]; then
-		CMD="curl $CURL_ARGS -o "$DOWNLOAD_NAME" $ARTIFACT_URL"
- 	else
- 		CMD="curl $CURL_ARGS -O $ARTIFACT_URL"
- 	fi
-
- 	# CD to the desired directory in a subshell so as not to affect
- 	# the rest of the script PWD
- 	if [ ! $TEST_ENV ]; then
- 		( cd "$CALLING_SCRIPT_DIR/SOURCES" > /dev/null ; `$CMD` )
- 	else
- 		echo $CMD # If under test environment
- 	fi
-}
-
 if [ ! -d "$CALLING_SCRIPT_DIR" ]; then
 	echo >&2 "Usage: . $0 [calling script directory]"
 	exit 1

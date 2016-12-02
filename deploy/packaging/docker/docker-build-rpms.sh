@@ -2,7 +2,7 @@
 #
 # This script will build and package all of the configurations listed in teh BUILD_ARGS_MATRIX array.
 #
-
+# Source all our reusable functionality, argument is the location of this script.
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
@@ -37,7 +37,7 @@ else
     )
 fi
 
-export MVN_PACKAGE_FAT_JARS_CMD="/usr/src/geowave/deploy/packaging/rpm/admin-scripts/jenkins-build-geowave.sh $SKIP_EXTRA"
+export MVN_PACKAGE_FAT_JARS_CMD="/usr/src/geowave/deploy/packaging/docker/build-geowave.sh $SKIP_EXTRA"
 mkdir $DOCKER_ROOT
 
 $WORKSPACE/deploy/packaging/docker/pull-s3-caches.sh $DOCKER_ROOT
@@ -51,19 +51,17 @@ do
 		-e WORKSPACE=/usr/src/geowave \
 		-e BUILD_ARGS="$build_args" \
 		-e MAVEN_OPTS="-Xmx1500m" \
-		-e LOCAL_USER_ID="$(whoami)" \
 		-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
 		ngageoint/geowave-centos6-java8-build \
 		/bin/bash -c \
-		"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chown -R \$LOCAL_USER_ID \$WORKSPACE"
+		"cd \$WORKSPACE && $MVN_PACKAGE_FAT_JARS_CMD && chmod -R 777 \$WORKSPACE"
 
 	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
-		-e LOCAL_USER_ID="$(whoami)" \
 		-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
     	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
-    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh && chown -R \$LOCAL_USER_ID \$WORKSPACE/deploy/packaging"
+    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh  && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"
 done

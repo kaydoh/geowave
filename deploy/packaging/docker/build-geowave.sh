@@ -27,8 +27,8 @@ cp $WORKSPACE/deploy/target/geowave-tools.jar $WORKSPACE/deploy/target/geowave-j
 
 # Run the Jace hack
 cd $WORKSPACE
-chmod +x $WORKSPACE/deploy/packaging/rpm/admin-scripts/install-jace.sh
-$WORKSPACE/deploy/packaging/rpm/admin-scripts/install-jace.sh $BUILD_ARGS "$@"
+chmod +x $WORKSPACE/deploy/packaging/docker/install-jace.sh
+$WORKSPACE/deploy/packaging/docker/install-jace.sh $BUILD_ARGS "$@"
 
 cd $WORKSPACE
 # Build the jace bindings
