@@ -49,11 +49,10 @@ public class BasicHBaseOperations implements
 			final boolean bigtable )
 			throws IOException {
 		if (bigtable) {
-			// Configuration config = HBaseConfiguration.create();
 			Configuration config = BigtableConfiguration.configure(projectId, instanceId);
 			
 			// TODO: Bigtable configgy things? What about connection pooling?
-			// config.setBoolean("hbase.online.schema.update.enable", true);
+			config.setBoolean("hbase.online.schema.update.enable", true);
 			
 			conn = BigtableConfiguration.connect(config);
 		}

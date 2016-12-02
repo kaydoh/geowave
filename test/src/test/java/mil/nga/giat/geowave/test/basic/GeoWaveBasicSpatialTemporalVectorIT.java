@@ -42,10 +42,10 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 {
 	private final static Logger LOGGER = Logger.getLogger(GeoWaveBasicSpatialTemporalVectorIT.class);
 
-//	private static final String HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE = HAIL_TEST_CASE_PACKAGE
-//			+ "hail-box-temporal-filter.shp";
-//	private static final String HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE = HAIL_TEST_CASE_PACKAGE
-//			+ "hail-polygon-temporal-filter.shp";
+	private static final String HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE = HAIL_TEST_CASE_PACKAGE
+			+ "hail-box-temporal-filter.shp";
+	private static final String HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE = HAIL_TEST_CASE_PACKAGE
+			+ "hail-polygon-temporal-filter.shp";
 	private static final String TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE = TORNADO_TRACKS_TEST_CASE_PACKAGE
 			+ "tornado_tracks-box-temporal-filter.shp";
 	private static final String TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE = TORNADO_TRACKS_TEST_CASE_PACKAGE
@@ -67,9 +67,9 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 		 * Here we are testing non-default HBase options, we may want to
 		 * consider testing some non-default Accumulo options as well
 		 */
-		"enableCustomFilters=true",
-		"enableCoprocessors=true",
-		"verifyCoprocessors=true"
+		"enableCustomFilters=false",
+		"enableCoprocessors=false",
+		"verifyCoprocessors=false"
 	})
 	protected DataStorePluginOptions dataStore;
 	private static long startMillis;
@@ -98,11 +98,11 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 	@Test
 	public void testIngestAndQuerySpatialTemporalPointsAndLines() {
 		// ingest both lines and points
-//		TestUtils.testLocalIngest(
-//				dataStore,
-//				DimensionalityType.SPATIAL_TEMPORAL,
-//				HAIL_SHAPEFILE_FILE,
-//				1);
+		TestUtils.testLocalIngest(
+				dataStore,
+				DimensionalityType.SPATIAL_TEMPORAL,
+				HAIL_SHAPEFILE_FILE,
+				1);
 
 		TestUtils.testLocalIngest(
 				dataStore,
@@ -115,8 +115,8 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 					new File(
 							TEST_BOX_TEMPORAL_FILTER_FILE).toURI().toURL(),
 					new URL[] {
-						/*new File(
-								 HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(), */
+						new File(
+								 HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
 						new File(
 								TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()
 					},
@@ -130,16 +130,16 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 		}
 
 		try {
-//			testQuery(
-//					new File(
-//							TEST_POLYGON_TEMPORAL_FILTER_FILE).toURI().toURL(),
-//					new URL[] {
-//						new File(
-//								HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
-//						new File(
-//								TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()
-//					},
-//					"polygon constraint and time range");
+			testQuery(
+					new File(
+							TEST_POLYGON_TEMPORAL_FILTER_FILE).toURI().toURL(),
+					new URL[] {
+						new File(
+								HAIL_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
+						new File(
+								TORNADO_TRACKS_EXPECTED_POLYGON_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()
+					},
+					"polygon constraint and time range");
 		}
 		catch (final Exception e) {
 			e.printStackTrace();
@@ -294,8 +294,8 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 					new File(
 							TEST_BOX_TEMPORAL_FILTER_FILE).toURI().toURL(),
 					new URL[] {
-						 /*new File(
-								HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(), */
+						 new File(
+								HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
 						new File(
 								TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()
 					},
