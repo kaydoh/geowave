@@ -17,9 +17,6 @@ echo "BUILD_ARGS=${BUILD_ARGS}"
 echo "VENDOR_VERSION=${VENDOR_VERSION}"
 echo "---------------------------------------------------------------"
 
-# Ensure mounted volume permissions are OK for access
-#chown -R root:root /usr/src/geowave/deploy
-
 # Staging Artifacts for Build
 cd /usr/src/geowave/deploy/packaging/rpm/centos/6/SOURCES
 rm -f *.gz *.jar

@@ -9,8 +9,21 @@ WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
 SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
+GEOSERVER_ARTIFACT=$WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES/geoserver.zip
 # selinux config if needed
 type getenforce >/dev/null 2>&1 && getenforce >/dev/null 2>&1 && chcon -Rt svirt_sandbox_file_t $WORKSPACE;
+
+if [ -z $GEOSERVER_DOWNLOAD_BASE ]; then
+	GEOSERVER_DOWNLOAD_BASE=https://s3.amazonaws.com/geowave-deploy/third-party-downloads/geoserver
+fi
+
+if [ -z $GEOSERVER_VERSION ]; then
+	GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
+fi
+
+if [ ! -f "$GEOSERVER_ARTIFACT" ]; then
+	curl $GEOSERVER_DOWNLOAD_BASE/$GEOSERVER_VERSION > $GEOSERVER_ARTIFACT
+fi
 
 # If you'd like to build a different set of artifacts rename build-args-matrix.sh.example
 if [ -f $SCRIPT_DIR/build-args-matrix.sh ]; then
