@@ -13,7 +13,6 @@ import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
@@ -189,17 +188,24 @@ public abstract class HBaseFilteredIndexQuery extends
 				}
 
 				// Add distributable filters if requested, this has to be last
-				// in
-				// the
-				// filter list for the dedupe filter to work correctly
+				// in the filter list for the dedupe filter to work correctly
 				final List<DistributableQueryFilter> distFilters = getDistributableFilters();
-				if (distFilters != null) {
+				if ((distFilters != null) && !distFilters.isEmpty()) {
 					final HBaseDistributableFilter hbdFilter = new HBaseDistributableFilter();
 					hbdFilter.init(
 							distFilters,
 							index.getIndexModel());
 
 					filterList.addFilter(hbdFilter);
+				}
+				else {
+					final List<MultiDimensionalCoordinateRangesArray> coords = getCoordinateRanges();
+					if ((coords != null) && !coords.isEmpty()) {
+						final HBaseNumericIndexStrategyFilter numericIndexFilter = new HBaseNumericIndexStrategyFilter(
+								index.getIndexStrategy(),
+								coords.toArray(new MultiDimensionalCoordinateRangesArray[] {}));
+						filterList.addFilter(numericIndexFilter);
+					}
 				}
 			}
 
@@ -306,6 +312,29 @@ public abstract class HBaseFilteredIndexQuery extends
 		final MultiRowRangeFilter filter = getMultiRowRangeFilter(ranges);
 		if (filter != null) {
 			filterList.addFilter(filter);
+			
+			final List<RowRange> rowRanges = filter.getRowRanges();
+			multiScanner.setStartRow(rowRanges.get(
+					0).getStartRow());
+
+			final RowRange stopRowRange = rowRanges.get(rowRanges.size() - 1);
+			byte[] stopRowExclusive;
+			if (stopRowRange.isStopRowInclusive()) {
+				// because the end is always exclusive, to make an inclusive
+				// stop row into exlusive all we need to do is add a traling 0
+				stopRowExclusive = new byte[stopRowRange.getStopRow().length + 1];
+
+				System.arraycopy(
+						stopRowRange.getStopRow(),
+						0,
+						stopRowExclusive,
+						0,
+						stopRowExclusive.length - 1);
+			}
+			else {
+				stopRowExclusive = stopRowRange.getStopRow();
+			}
+			multiScanner.setStopRow(stopRowExclusive);
 		}
 
 		return multiScanner;
@@ -403,6 +432,11 @@ public abstract class HBaseFilteredIndexQuery extends
 
 	// Override this (see HBaseConstraintsQuery)
 	protected List<DistributableQueryFilter> getDistributableFilters() {
+		return null;
+	}
+
+	// Override this (see HBaseConstraintsQuery)
+	protected List<MultiDimensionalCoordinateRangesArray> getCoordinateRanges() {
 		return null;
 	}
 
