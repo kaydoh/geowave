@@ -8,8 +8,8 @@ if [ -z $NO_MAVEN_INIT ] && [ ! -d $1/.m2 ]; then
 	CACHE_FILE=mvn-repo-cache-20161129.tar
 	pushd $1
 	curl -O $MVN_CACHE_BASE/$CACHE_FILE
-	tar xf $CACHE_FILE
-	rm -f $CACHE_FILE
+	tar xf $1/$CACHE_FILE
+	rm -f $1/$CACHE_FILE
 	popd
 	type getenforce >/dev/null 2>&1 &&  getenforce >/dev/null 2>&1 && chcon -Rt svirt_sandbox_file_t ~/.m2;
 	echo "Finished Downloading Maven Cache ..."
@@ -24,7 +24,7 @@ if [ -z $GEOSERVER_VERSION ]; then
 	GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
 fi
 
-GEOSERVER_ARTIFACT=/usr/src/geowave/deploy/packaging/rpm/centos/6/SOURCES/geoserver.zip
+GEOSERVER_ARTIFACT=$1/deploy/packaging/rpm/centos/6/SOURCES/geoserver.zip
 if [ ! -f "$GEOSERVER_ARTIFACT" ]; then
 	curl $GEOSERVER_DOWNLOAD_BASE/$GEOSERVER_VERSION > $GEOSERVER_ARTIFACT
 fi
