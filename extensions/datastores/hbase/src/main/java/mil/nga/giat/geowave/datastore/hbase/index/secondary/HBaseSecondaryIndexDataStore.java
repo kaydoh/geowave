@@ -131,7 +131,7 @@ public class HBaseSecondaryIndexDataStore extends
 
 		final Delete d = new Delete(
 				secondaryIndexRowId);
-		d.addColumn(
+		d.addColumns(
 				secondaryIndexId,
 				attributeName);
 
