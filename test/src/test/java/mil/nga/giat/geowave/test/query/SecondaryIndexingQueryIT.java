@@ -78,6 +78,7 @@ public class SecondaryIndexingQueryIT
 	private PrimaryIndex index;
 	@GeoWaveTestStore({
 		GeoWaveStoreType.ACCUMULO,
+		GeoWaveStoreType.BIGTABLE,
 		GeoWaveStoreType.HBASE
 	})
 	protected DataStorePluginOptions dataStoreOptions;
