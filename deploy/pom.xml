@@ -14,6 +14,7 @@
 		<hbase.finalName>${project.artifactId}-${project.version}-hbase</hbase.finalName>
 		<accumulo.finalName>${project.artifactId}-${project.version}-accumulo</accumulo.finalName>
 		<geotools.finalName>${project.artifactId}-${project.version}-geotools</geotools.finalName>
+		<jace.finalName>${project.artifactId}-${project.version}-jace</jace.finalName>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<BUILD_SHARED_LIBS>ON</BUILD_SHARED_LIBS>
@@ -622,7 +623,7 @@
 									</transformers>
 									<createDependencyReducedPom>false</createDependencyReducedPom>
 									<minimizeJar>false</minimizeJar>
-									<finalName>${project.build.finalName}-jace</finalName>
+									<finalName>${jace.finalName}</finalName>
 								</configuration>
 							</execution>
 						</executions>
@@ -689,7 +690,7 @@
 									<outputSources>${project.build.directory}/dependency/jace/source</outputSources>
 									<classpath>
 										<path>${env.JAVA_HOME}/jre/lib/rt.jar</path>
-										<path>${project.build.directory}/${project.build.finalName}-jace.jar</path>
+										<path>${project.build.directory}/${jace.finalName}.jar</path>
 									</classpath>
 
 									<accessibility>PUBLIC</accessibility>

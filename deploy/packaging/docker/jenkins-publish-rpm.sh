@@ -30,7 +30,7 @@ rpm2cpio *.rpm | cpio -idmv
 rm -f *.rpm *.xml *.spec
 
 # Extract the build metadata from one of the artifacts
-unzip -p geowave-accumulo.jar build.properties > build.properties
+unzip -p geowave-accumulo-${ARGS[vendor-version]}.jar build.properties > build.properties
 
 # Extract the pdf version of the docs so it's more visibly available
 tar xzf site.tar.gz --strip-components=1  site/documentation.pdf
@@ -41,15 +41,10 @@ githash=$(cat geowave/build.properties | grep project.scm.revision | sed -e 's/p
 version=$(cat geowave/build.properties | grep project.version | sed -e 's/project.version=//g')
 tar cvzf geowave-${ARGS[vendor-version]}-$version-${githash:0:7}.tar.gz geowave
 
-# Push our compiled docs to S3 if aws command has been installed
-if command -v aws >/dev/null 2>&1 ; then
-    aws s3 cp geowave/documentation.pdf s3://geowave/docs/
-fi
-
 rm -rf geowave
 
 # Copy the Jace artifacts
-cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-jace.tar.gz ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave-$version-${githash:0:7}-jace.tar.gz
+cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-jace-${ARGS[vendor-version]}.tar.gz ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave-jace-${ARGS[vendor-version]}-$version-${githash:0:7}.tar.gz
 
 echo '###### Copy rpm to repo and reindex'
 
