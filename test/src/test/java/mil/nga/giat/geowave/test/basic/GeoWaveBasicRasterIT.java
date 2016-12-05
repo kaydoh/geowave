@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -80,10 +77,7 @@ public class GeoWaveBasicRasterIT
 
 	@Test
 	public void testNoDataMergeStrategy()
-			throws IOException,
-			AccumuloException,
-			AccumuloSecurityException,
-			TableNotFoundException {
+			throws IOException {
 		final String coverageName = "testNoDataMergeStrategy";
 		final int tileSize = 256;
 		final double westLon = 0;
@@ -101,10 +95,7 @@ public class GeoWaveBasicRasterIT
 
 	@Test
 	public void testMultipleMergeStrategies()
-			throws IOException,
-			AccumuloException,
-			AccumuloSecurityException,
-			TableNotFoundException {
+			throws IOException {
 		final String noDataCoverageName = "testMultipleMergeStrategies_NoDataMergeStrategy";
 		final String summingCoverageName = "testMultipleMergeStrategies_SummingMergeStrategy";
 		final String sumAndAveragingCoverageName = "testMultipleMergeStrategies_SumAndAveragingMergeStrategy";
@@ -180,10 +171,7 @@ public class GeoWaveBasicRasterIT
 			final double eastLon,
 			final double southLat,
 			final double northLat )
-			throws IOException,
-			AccumuloException,
-			AccumuloSecurityException,
-			TableNotFoundException {
+			throws IOException {
 		ingestNoDataMergeStrategy(
 				coverageName,
 				tileSize,
@@ -198,10 +186,7 @@ public class GeoWaveBasicRasterIT
 
 	private void queryNoDataMergeStrategy(
 			final String coverageName,
-			final int tileSize )
-			throws AccumuloException,
-			AccumuloSecurityException,
-			IOException {
+			final int tileSize ) throws IOException {
 		final DataStore dataStore = dataStoreOptions.createDataStore();
 
 		try (CloseableIterator<?> it = dataStore.query(
@@ -614,9 +599,7 @@ public class GeoWaveBasicRasterIT
 			final int numBands,
 			final int numRasters,
 			final ExpectedValue expectedValue )
-			throws AccumuloException,
-			AccumuloSecurityException,
-			IOException {
+			throws IOException {
 		final DataStore dataStore = dataStoreOptions.createDataStore();
 
 		try (CloseableIterator<?> it = dataStore.query(

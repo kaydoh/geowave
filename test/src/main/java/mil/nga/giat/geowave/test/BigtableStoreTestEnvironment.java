@@ -28,7 +28,7 @@ public class BigtableStoreTestEnvironment extends
 
 	private final static Logger LOGGER = Logger.getLogger(
 			BigtableStoreTestEnvironment.class);
-	protected String zookeeper;
+//	protected String zookeeper;
 
 	private BigtableStoreTestEnvironment() {}
 
@@ -43,7 +43,7 @@ public class BigtableStoreTestEnvironment extends
 		hbaseOptions.setEnableCoprocessors(
 				false);
 		
-		((HBaseRequiredOptions) options).setZookeeper(zookeeper);
+//		((HBaseRequiredOptions) options).setZookeeper(zookeeper);
 	}
 
 	@Override
@@ -53,14 +53,14 @@ public class BigtableStoreTestEnvironment extends
 
 	@Override
 	public void setup() {
-		if (!TestUtils.isSet(zookeeper)) {
-			zookeeper = System.getProperty(ZookeeperTestEnvironment.ZK_PROPERTY_NAME);
-
-			if (!TestUtils.isSet(zookeeper)) {
-				zookeeper = ZookeeperTestEnvironment.getInstance().getZookeeper();
-				LOGGER.debug("Using local zookeeper URL: " + zookeeper);
-			}
-		}
+//		if (!TestUtils.isSet(zookeeper)) {
+//			zookeeper = System.getProperty(ZookeeperTestEnvironment.ZK_PROPERTY_NAME);
+//
+//			if (!TestUtils.isSet(zookeeper)) {
+//				zookeeper = ZookeeperTestEnvironment.getInstance().getZookeeper();
+//				LOGGER.debug("Using local zookeeper URL: " + zookeeper);
+//			}
+//		}
 
 		// Bigtable IT's rely on an external gcloud emulator
 		// initGcloud();
@@ -123,7 +123,7 @@ public class BigtableStoreTestEnvironment extends
 	@Override
 	public TestEnvironment[] getDependentEnvironments() {
 		return new TestEnvironment[] {
-			ZookeeperTestEnvironment.getInstance()
+//			ZookeeperTestEnvironment.getInstance()
 		};
 	}
 }
