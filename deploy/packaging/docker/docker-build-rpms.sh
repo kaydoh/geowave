@@ -50,7 +50,7 @@ docker run --rm \
 	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
 	ngageoint/geowave-centos6-java8-build \
 	/bin/bash -c \
-	"cd \$WORKSPACE && $MVN_PACKAGE_COMMON_CMD && chmod -R 777 \$WORKSPACE"
+	"chmod -R 777 \$WORKSPACE && cd \$WORKSPACE && $MVN_PACKAGE_COMMON_CMD && chmod -R 777 \$WORKSPACE"
 	
 docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
@@ -72,7 +72,7 @@ do
 		-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
 		ngageoint/geowave-centos6-java8-build \
 		/bin/bash -c \
-		"cd \$WORKSPACE && $MVN_PACKAGE_VENDOR_CMD && chmod -R 777 \$WORKSPACE"
+		"chmod -R 777 \$WORKSPACE && cd \$WORKSPACE && $MVN_PACKAGE_VENDOR_CMD && chmod -R 777 \$WORKSPACE"
 
 	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \

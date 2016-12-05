@@ -18,8 +18,3 @@ fi
 if [ ! -f $WORKSPACE/deploy/target/puppet-scripts.tar.gz ]; then
     tar -czf $WORKSPACE/deploy/target/puppet-scripts.tar.gz -C $WORKSPACE/deploy/packaging/puppet geowave
 fi
-
-# Push our compiled docs to S3 if aws command has been installed
-if command -v aws >/dev/null 2>&1 ; then
-    aws s3 cp geowave/documentation.pdf s3://geowave/docs/
-fi

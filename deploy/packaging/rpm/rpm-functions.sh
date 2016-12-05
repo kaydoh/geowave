@@ -98,14 +98,6 @@ clean() {
     rm -rf $CALLING_SCRIPT_DIR/TARBALL/*
 }
 
-# All configurable strings should be externalized to a props file
-source_props() {
-	. $ADMIN_SCRIPTS_DIR/default-props.sh
-	if [ -f $ADMIN_SCRIPTS_DIR/local-props.sh ]; then
-	  . $ADMIN_SCRIPTS_DIR/local-props.sh
-	fi
-}
-
 # Just grabbed off the Interwebs, looks to give sane results in the 
 # couple of tests I've written. Add more and tweak if found to be defective
 isValidUrl() {
@@ -117,5 +109,3 @@ if [ ! -d "$CALLING_SCRIPT_DIR" ]; then
 	echo >&2 "Usage: . $0 [calling script directory]"
 	exit 1
 fi
-
-source_props

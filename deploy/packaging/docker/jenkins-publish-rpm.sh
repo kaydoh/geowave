@@ -35,6 +35,11 @@ unzip -p geowave-accumulo-${ARGS[vendor-version]}.jar build.properties > build.p
 # Extract the pdf version of the docs so it's more visibly available
 tar xzf site.tar.gz --strip-components=1  site/documentation.pdf
 
+# Push our compiled docs to S3 if aws command has been installed
+if command -v aws >/dev/null 2>&1 ; then
+    aws s3 cp site/documentation.pdf s3://geowave/docs/
+fi
+
 # Archive things, copy some artifacts up to AWS if available and get rid of our temp area
 cd ..
 githash=$(cat geowave/build.properties | grep project.scm.revision | sed -e 's/project.scm.revision=//g')
