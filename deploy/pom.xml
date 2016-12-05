@@ -31,21 +31,6 @@
 			<artifactId>geowave-adapter-raster</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>mil.nga.giat</groupId>
-			<artifactId>geowave-analytic-mapreduce</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>mil.nga.giat</groupId>
-			<artifactId>geowave-datastore-accumulo</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>mil.nga.giat</groupId>
-			<artifactId>geowave-datastore-hbase</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<resources>
@@ -96,6 +81,21 @@
 		<profile>
 			<id>geowave-tools-singlejar</id>
 			<dependencies>
+				<dependency>
+					<groupId>mil.nga.giat</groupId>
+					<artifactId>geowave-analytic-mapreduce</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>mil.nga.giat</groupId>
+					<artifactId>geowave-datastore-accumulo</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>mil.nga.giat</groupId>
+					<artifactId>geowave-datastore-hbase</artifactId>
+					<version>${project.version}</version>
+				</dependency>
 				<dependency>
 					<groupId>mil.nga.giat</groupId>
 					<artifactId>geowave-cli-osm</artifactId>
@@ -340,9 +340,14 @@
 			<dependencyManagement>
 				<dependencies>
 					<dependency>
-						<groupId>com.google.guava</groupId>
-						<artifactId>guava</artifactId>
-						<version>16.0</version>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-datastore-accumulo</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-datastore-hbase</artifactId>
+						<version>${project.version}</version>
 					</dependency>
 				</dependencies>
 			</dependencyManagement>
@@ -368,7 +373,8 @@
 											<exclude>commons-codec:commons-codec</exclude>
 
 											<!-- the required version of guava should exist in geoserver's 
-												classpath, although in order to get guava's StopWatch working with HBase 1.2.x we need no later than guava 16.0 -->
+												classpath, although in order to get guava's StopWatch working with HBase 
+												1.2.x we need no later than guava 16.0 -->
 											<exclude>com.google.guava:guava</exclude>
 											<!-- even though commons-lang should exist in geoserver's classpath 
 												it is version 2.1 which is missing necessary classes, <exclude>*:commons-lang:*</exclude> -->
@@ -457,24 +463,6 @@
 		</profile>
 		<profile>
 			<id>accumulo-container-singlejar</id>
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<!-- because distributable packages are built from this module, this 
-							is here to override the scope supplied by geowave-accumulo -->
-						<groupId>org.apache.accumulo</groupId>
-						<artifactId>accumulo-core</artifactId>
-						<version>${accumulo.version}</version>
-						<scope>provided</scope>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.hadoop</groupId>
-						<artifactId>hadoop-common</artifactId>
-						<version>${hadoop.version}</version>
-						<scope>provided</scope>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
 			<build>
 				<plugins>
 					<plugin>
@@ -560,14 +548,6 @@
 									<goal>shade</goal>
 								</goals>
 								<configuration>
-									<artifactSet>
-										<includes>
-											<include>mil.nga.giat:geowave-core-store</include>
-											<include>mil.nga.giat:geowave-core-geotime</include>
-											<include>mil.nga.giat:geowave-core-index</include>
-											<include>com.vividsolutions:jts-core</include>
-										</includes>
-									</artifactSet>
 									<filters>
 										<filter>
 											<artifact>*:*</artifact>
@@ -594,6 +574,85 @@
 		</profile>
 		<profile>
 			<id>generate-geowave-jace</id>
+			<dependencyManagement>
+				<dependencies>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-analytic-mapreduce</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-datastore-accumulo</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-datastore-hbase</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-cli-osm</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-cli-geoserver</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-cli-landsat8</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-4676</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-avro</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-gdelt</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-geolife</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-gpx</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-raster</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-tdrive</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-twitter</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mil.nga.giat</groupId>
+						<artifactId>geowave-format-vector</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+				</dependencies>
+			</dependencyManagement>
 			<build>
 				<plugins>
 					<plugin>

@@ -59,7 +59,7 @@ buildArg() {
 parseVersion() {
 	# We're actually just going to examine a single artifact but they should match
 	# Extract the metadata file and remove any SNAPSHOT identifiers, we'll add a timestamp to our RPM name
-    echo $(unzip -p SOURCES/geowave-accumulo.jar build.properties | grep "project.version=" | sed -e 's/"//g' -e 's/-SNAPSHOT//g' -e 's/project.version=//g')
+    echo $(unzip -p SOURCES/geowave-accumulo-$1.jar build.properties | grep "project.version=" | sed -e 's/"//g' -e 's/-SNAPSHOT//g' -e 's/project.version=//g')
 }
 
 # Given a version string, remove all dots and patch version dash labels, then take the first three sets of digits
@@ -84,10 +84,10 @@ parsePriorityFromVersion() {
 }
 
 # Default build function, should be overridden by local script if more complex
-build() {
+#build() {
 	# Create the rpms
-	rpmbuild --define "_topdir `pwd`" --define "_version $(parseVersion)" $(buildArg "$1") SPECS/*.spec
-}
+#	rpmbuild --define "_topdir `pwd`" --define "_version $(parseVersion $1)" $(buildArg "$1") SPECS/*.spec
+#}
 
 # Removes all files except spec and sources
 clean() {

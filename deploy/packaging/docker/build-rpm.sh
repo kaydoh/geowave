@@ -20,7 +20,7 @@ echo "---------------------------------------------------------------"
 chown -R root:root $WORKSPACE/deploy/packaging/rpm
 
 # Now make sure the host can easily modify/delete generated artifacts
-cmod -R 777 $WORKSPACE/deploy/packaging/rpm
+chmod -R 777 $WORKSPACE/deploy/packaging/rpm
 
 # Staging Artifacts for Build
 cd $WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES
