@@ -30,9 +30,10 @@ BuildArch:      noarch
 Summary:        GeoWave provides geospatial and temporal indexing on top of Accumulo and HBase
 License:        Apache2
 Group:          Applications/Internet
-Source13:       site.tar.gz
-Source14:       puppet-scripts.tar.gz
-Source15:       manpages.tar.gz
+Source1:        bash_profile.sh
+Source2:        site.tar.gz
+Source3:        manpages.tar.gz
+Source4:        puppet-scripts.tar.gz
 BuildRequires:  unzip
 BuildRequires:  zip
 BuildRequires:  xmlto
@@ -42,19 +43,23 @@ BuildRequires:  asciidoc
 GeoWave provides geospatial and temporal indexing on top of Accumulo and HBase.
 
 %install
+# Copy system service files into place
+mkdir -p %{buildroot}/etc/profile.d
+cp %{SOURCE1} %{buildroot}/etc/profile.d/geowave.sh
+
 # Copy documentation into place
 mkdir -p %{buildroot}%{geowave_docs_home}
-tar -xzf %{SOURCE13} -C %{buildroot}%{geowave_docs_home} --strip=1
+tar -xzf %{SOURCE2} -C %{buildroot}%{geowave_docs_home} --strip=1
 
 # Copy man pages into place
 mkdir -p %{buildroot}/usr/local/share/man/man1
-tar -xvf %{SOURCE15} -C %{buildroot}/usr/local/share/man/man1
+tar -xvf %{SOURCE3} -C %{buildroot}/usr/local/share/man/man1
 rm -rf %{buildroot}%{geowave_docs_home}/manpages
 rm -f %{buildroot}%{geowave_docs_home}/*.pdfmarks
 
 # Puppet scripts
 mkdir -p %{buildroot}/etc/puppet/modules
-tar -xzf %{SOURCE14} -C %{buildroot}/etc/puppet/modules
+tar -xzf %{SOURCE4} -C %{buildroot}/etc/puppet/modules
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

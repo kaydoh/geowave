@@ -10,8 +10,7 @@ DOCKER_ROOT=$WORKSPACE/docker-root
 SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
 GEOSERVER_ARTIFACT=$WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES/geoserver.zip
-# selinux config if needed
-type getenforce >/dev/null 2>&1 && getenforce >/dev/null 2>&1 && chcon -Rt svirt_sandbox_file_t $WORKSPACE;
+GEOWAVE_VERSION=${mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version}
 
 if [ -z $GEOSERVER_DOWNLOAD_BASE ]; then
 	GEOSERVER_DOWNLOAD_BASE=https://s3.amazonaws.com/geowave-deploy/third-party-downloads/geoserver
@@ -56,6 +55,7 @@ docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
 	-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
 	-e BUILD_TYPE="common" \
+	-e GEOWAVE_VERSION="${GEOWAVE_VERSION}" \
     -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \

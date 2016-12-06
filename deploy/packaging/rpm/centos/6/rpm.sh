@@ -16,7 +16,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-GEOWAVE_VERSION=$(parseVersion ${ARGS[vendor-version]})
+GEOWAVE_VERSION=${ARGS[geowave-version]}
 
 case ${ARGS[command]} in
     build-vendor) rpmbuild \

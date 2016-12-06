@@ -12,6 +12,7 @@ fi
 echo "---------------------------------------------------------------"
 echo "             Building RPM with the following settings"
 echo "---------------------------------------------------------------"
+echo "GEOWAVE_VERSION=${GEOWAVE_VERSION}"
 echo "GEOSERVER_VERSION=${GEOSERVER_VERSION}"
 echo "BUILD_ARGS=${BUILD_ARGS}"
 echo "VENDOR_VERSION=${VENDOR_VERSION}"
@@ -32,4 +33,4 @@ cp /usr/src/geowave/deploy/target/*.tar.gz .
 cd ..
 
 # Build
-$WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command build-${BUILD_TYPE} --vendor-version $VENDOR_VERSION
+$WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command build-${BUILD_TYPE} --vendor-version $VENDOR_VERSION --geowave-version $GEOWAVE_VERSION

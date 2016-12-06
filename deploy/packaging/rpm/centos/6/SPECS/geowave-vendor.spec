@@ -38,11 +38,10 @@ Source4:        geoserver.zip
 Source5:        geowave-geoserver-%{vendor_version}.jar
 Source6:        geowave-logrotate.sh
 Source7:        geowave-init.sh
-Source8:        bash_profile.sh
-Source9:        default.xml
-Source10:       namespace.xml
-Source11:       workspace.xml
-Source12:       geowave-tools-%{vendor_version}.jar
+Source8:        default.xml
+Source9:        namespace.xml
+Source10:       workspace.xml
+Source11:       geowave-tools-%{vendor_version}.jar
 BuildRequires:  unzip
 BuildRequires:  zip
 BuildRequires:  xmlto
@@ -99,24 +98,22 @@ mkdir -p %{buildroot}/etc/logrotate.d
 cp %{SOURCE6} %{buildroot}/etc/logrotate.d/geowave
 mkdir -p %{buildroot}/etc/init.d
 cp %{SOURCE7} %{buildroot}/etc/init.d/geowave
-mkdir -p %{buildroot}/etc/profile.d
-cp %{SOURCE9} %{buildroot}/etc/profile.d/geowave.sh
 
 # Copy over our custom workspace config files
 mkdir -p %{buildroot}%{geowave_geoserver_data}/workspaces/geowave
-cp %{SOURCE9} %{buildroot}%{geowave_geoserver_data}/workspaces
+cp %{SOURCE8} %{buildroot}%{geowave_geoserver_data}/workspaces
+cp %{SOURCE9} %{buildroot}%{geowave_geoserver_data}/workspaces/geowave
 cp %{SOURCE10} %{buildroot}%{geowave_geoserver_data}/workspaces/geowave
-cp %{SOURCE11} %{buildroot}%{geowave_geoserver_data}/workspaces/geowave
 
 # Stage geowave tools
 mkdir -p %{buildroot}%{geowave_tools_home}
-cp %{SOURCE12} %{buildroot}%{geowave_tools_home}
+cp %{SOURCE11} %{buildroot}%{geowave_tools_home}
 cp %{buildroot}%{geowave_accumulo_home}/geowave-accumulo-build.properties %{buildroot}%{geowave_tools_home}/build.properties
 pushd %{buildroot}%{geowave_tools_home}
 zip -qg %{buildroot}%{geowave_tools_home}/geowave-tools-%{vendor_version}.jar build.properties
 popd
 mv %{buildroot}%{geowave_tools_home}/build.properties %{buildroot}%{geowave_tools_home}/geowave-tools-build.properties
-unzip -p %{SOURCE12} geowave-tools.sh > %{buildroot}%{geowave_tools_home}/geowave-tools.sh
+unzip -p %{SOURCE11} geowave-tools.sh > %{buildroot}%{geowave_tools_home}/geowave-tools.sh
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

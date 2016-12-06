@@ -55,13 +55,6 @@ buildArg() {
     echo "-$BUILD_ARG"
 }
 
-# Our artifacts will each have a build.properties file
-parseVersion() {
-	# We're actually just going to examine a single artifact but they should match
-	# Extract the metadata file and remove any SNAPSHOT identifiers, we'll add a timestamp to our RPM name
-    echo $(unzip -p SOURCES/geowave-accumulo-$1.jar build.properties | grep "project.version=" | sed -e 's/"//g' -e 's/-SNAPSHOT//g' -e 's/project.version=//g')
-}
-
 # Given a version string, remove all dots and patch version dash labels, then take the first three sets of digits
 # and interpret as an integer to determine the install priority number used by alternatives in an automated way
 parsePriorityFromVersion() {
@@ -82,12 +75,6 @@ parsePriorityFromVersion() {
         echo $(( 10#$VERSION ))
     fi
 }
-
-# Default build function, should be overridden by local script if more complex
-#build() {
-	# Create the rpms
-#	rpmbuild --define "_topdir `pwd`" --define "_version $(parseVersion $1)" $(buildArg "$1") SPECS/*.spec
-#}
 
 # Removes all files except spec and sources
 clean() {
