@@ -10,7 +10,8 @@ DOCKER_ROOT=$WORKSPACE/docker-root
 SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
 GEOSERVER_ARTIFACT=$WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES/geoserver.zip
-GEOWAVE_VERSION=${mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version}
+# Get the version from the parent pom
+GEOWAVE_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
 
 if [ -z $GEOSERVER_DOWNLOAD_BASE ]; then
 	GEOSERVER_DOWNLOAD_BASE=https://s3.amazonaws.com/geowave-deploy/third-party-downloads/geoserver
