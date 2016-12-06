@@ -44,5 +44,5 @@ if [ ! -f $WORKSPACE/deploy/target/geowave-jace-${VENDOR_VERSION}.tar.gz ]; then
     cp $WORKSPACE/deploy/jace/CMakeLists.txt $WORKSPACE/deploy/target/geowave-jace
     cp -R $WORKSPACE/deploy/target/dependency/jace/source $WORKSPACE/deploy/target/geowave-jace
     cp -R $WORKSPACE/deploy/target/dependency/jace/include $WORKSPACE/deploy/target/geowave-jace
-	tar -czf $WORKSPACE/deploy/target/geowave-jace-${VENDOR_VERSION}.tar.gz -C $WORKSPACE/deploy/target/*${VENDOR_VERSION}.jar geowave-jace
+	tar -czf $WORKSPACE/deploy/target/geowave-jace-${VENDOR_VERSION}.tar.gz -f $WORKSPACE/deploy/target/*${VENDOR_VERSION}.jar -C geowave-jace
 fi

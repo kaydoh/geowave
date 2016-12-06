@@ -16,5 +16,6 @@ fi
 
 ## Copy over the puppet scripts
 if [ ! -f $WORKSPACE/deploy/target/puppet-scripts.tar.gz ]; then
+	mkdir -p $WORKSPACE/deploy/target
     tar -czf $WORKSPACE/deploy/target/puppet-scripts.tar.gz -C $WORKSPACE/deploy/packaging/puppet geowave
 fi
