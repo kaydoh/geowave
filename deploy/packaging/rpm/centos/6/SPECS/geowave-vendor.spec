@@ -109,7 +109,7 @@ cp %{SOURCE10} %{buildroot}%{geowave_geoserver_data}/workspaces/geowave
 cp %{SOURCE11} %{buildroot}%{geowave_geoserver_data}/workspaces/geowave
 
 # Stage geowave tools
-mkdir -p %{buildroot}%{geowave_plugins_home}
+mkdir -p %{buildroot}%{geowave_tools_home}
 cp %{SOURCE12} %{buildroot}%{geowave_tools_home}
 cp %{buildroot}%{geowave_accumulo_home}/geowave-accumulo-build.properties %{buildroot}%{geowave_tools_home}/build.properties
 pushd %{buildroot}%{geowave_tools_home}
