@@ -12,6 +12,7 @@ import mil.nga.giat.geowave.core.store.StoreFactoryOptions;
 import mil.nga.giat.geowave.datastore.hbase.HBaseDataStoreFactory;
 import mil.nga.giat.geowave.datastore.hbase.operations.config.HBaseOptions;
 import mil.nga.giat.geowave.datastore.hbase.operations.config.HBaseRequiredOptions;
+import mil.nga.giat.geowave.test.annotation.GeoWaveTestStore.GeoWaveStoreType;
 
 public class BigtableStoreTestEnvironment extends
 		StoreTestEnvironment
@@ -26,9 +27,9 @@ public class BigtableStoreTestEnvironment extends
 		return singletonInstance;
 	}
 
-	private final static Logger LOGGER = Logger.getLogger(
-			BigtableStoreTestEnvironment.class);
-//	protected String zookeeper;
+	private final static Logger LOGGER = Logger.getLogger(BigtableStoreTestEnvironment.class);
+
+	// protected String zookeeper;
 
 	private BigtableStoreTestEnvironment() {}
 
@@ -36,14 +37,11 @@ public class BigtableStoreTestEnvironment extends
 	protected void initOptions(
 			final StoreFactoryOptions options ) {
 		HBaseOptions hbaseOptions = ((HBaseRequiredOptions) options).getAdditionalOptions();
-		hbaseOptions.setBigtable(
-				true);
-		hbaseOptions.setEnableCustomFilters(
-				false);
-		hbaseOptions.setEnableCoprocessors(
-				false);
-		
-//		((HBaseRequiredOptions) options).setZookeeper(zookeeper);
+		hbaseOptions.setBigtable(true);
+		hbaseOptions.setEnableCustomFilters(false);
+		hbaseOptions.setEnableCoprocessors(false);
+
+		// ((HBaseRequiredOptions) options).setZookeeper(zookeeper);
 	}
 
 	@Override
@@ -52,34 +50,38 @@ public class BigtableStoreTestEnvironment extends
 	}
 
 	@Override
+	protected GeoWaveStoreType getStoreType() {
+		return GeoWaveStoreType.BIGTABLE;
+	}
+
+	@Override
 	public void setup() {
-//		if (!TestUtils.isSet(zookeeper)) {
-//			zookeeper = System.getProperty(ZookeeperTestEnvironment.ZK_PROPERTY_NAME);
-//
-//			if (!TestUtils.isSet(zookeeper)) {
-//				zookeeper = ZookeeperTestEnvironment.getInstance().getZookeeper();
-//				LOGGER.debug("Using local zookeeper URL: " + zookeeper);
-//			}
-//		}
+		// if (!TestUtils.isSet(zookeeper)) {
+		// zookeeper =
+		// System.getProperty(ZookeeperTestEnvironment.ZK_PROPERTY_NAME);
+		//
+		// if (!TestUtils.isSet(zookeeper)) {
+		// zookeeper = ZookeeperTestEnvironment.getInstance().getZookeeper();
+		// LOGGER.debug("Using local zookeeper URL: " + zookeeper);
+		// }
+		// }
 
 		// Bigtable IT's rely on an external gcloud emulator
 		// initGcloud();
 	}
-	
+
 	// Currently being run from travis externally
 	private void initGcloud() {
-		String processDir = System.getProperty(
-				"user.dir");
-		LOGGER.warn(
-				"KAM >>> Running gcloud install in " + processDir);
-				
+		String processDir = System.getProperty("user.dir");
+		LOGGER.warn("KAM >>> Running gcloud install in " + processDir);
+
 		String chmodIt = "/bin/bash -c chmod 755 " + processDir + "/gcloud-init.sh";
 		String chmodOut = executeCommand(chmodIt);
 		LOGGER.warn(chmodOut);
 
 		String cmdOut = executeCommand(processDir + "/gcloud-init.sh");
 		LOGGER.warn(cmdOut);
-		
+
 		String sourceIt = "/bin/bash -c " + processDir + "/exportBigtableEnv";
 		String srcOut = executeCommand(sourceIt);
 		LOGGER.warn(cmdOut);
@@ -100,8 +102,7 @@ public class BigtableStoreTestEnvironment extends
 
 			String line = "";
 			while ((line = reader.readLine()) != null) {
-				output.append(
-						line + "\n");
+				output.append(line + "\n");
 			}
 
 		}
@@ -123,7 +124,7 @@ public class BigtableStoreTestEnvironment extends
 	@Override
 	public TestEnvironment[] getDependentEnvironments() {
 		return new TestEnvironment[] {
-//			ZookeeperTestEnvironment.getInstance()
+		// ZookeeperTestEnvironment.getInstance()
 		};
 	}
 }

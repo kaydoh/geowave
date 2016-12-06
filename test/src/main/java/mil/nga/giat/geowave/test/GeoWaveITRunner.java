@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -272,13 +274,14 @@ public class GeoWaveITRunner extends
 		List<GeoWaveStoreRunnerConfig> configs = new ArrayList<GeoWaveStoreRunnerConfig>();
 
 		final String storeTypeProp = System.getProperty(STORE_TYPE_PROPERTY_NAME);
-		
+
 		// See if user specified a single store type
 		if (TestUtils.isSet(storeTypeProp)) {
 			final Set<String> dataStoreOptionFields = getDataStoreOptionFieldsForTypeAnnotation();
 			final GeoWaveStoreType storeType = GeoWaveStoreType.valueOf(storeTypeProp);
-			
-			// If no match, the configs list will be empty and the IT will be a no-op
+
+			// If no match, the configs list will be empty and the IT will be a
+			// no-op
 			if (containsAnnotationForType(storeType)) {
 				configs.add(new GeoWaveStoreRunnerConfig(
 						storeType,
@@ -313,7 +316,7 @@ public class GeoWaveITRunner extends
 				}
 			}
 		}
-		
+
 		// Create a test runner for each store type / config
 		for (final GeoWaveStoreRunnerConfig config : configs) {
 			final TestClassRunnerForStoreTypes runner = new TestClassRunnerForStoreTypes(
@@ -535,10 +538,10 @@ public class GeoWaveITRunner extends
 	{
 		// just keep a two-way mapping although I think we only need to traverse
 		// in one direction
-		Map<TestEnvironment, Set<TestEnvironment>> dependenciesMapping = new HashMap<TestEnvironment, Set<TestEnvironment>>();
-		Map<TestEnvironment, Set<TestEnvironment>> requirementsMapping = new HashMap<TestEnvironment, Set<TestEnvironment>>();
-		Set<TestEnvironment> independentEnvironments = new HashSet<TestEnvironment>();
-		Set<TestEnvironment> visitedEnvs = new HashSet<TestEnvironment>();
+		Map<TestEnvironment, Set<TestEnvironment>> dependenciesMapping = new LinkedHashMap<TestEnvironment, Set<TestEnvironment>>();
+		Map<TestEnvironment, Set<TestEnvironment>> requirementsMapping = new LinkedHashMap<TestEnvironment, Set<TestEnvironment>>();
+		Set<TestEnvironment> independentEnvironments = new LinkedHashSet<TestEnvironment>();
+		Set<TestEnvironment> visitedEnvs = new LinkedHashSet<TestEnvironment>();
 
 		private TestEnvironmentDependencyTree() {}
 

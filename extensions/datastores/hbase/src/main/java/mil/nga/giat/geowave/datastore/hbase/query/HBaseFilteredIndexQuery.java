@@ -313,7 +313,7 @@ public abstract class HBaseFilteredIndexQuery extends
 		final MultiRowRangeFilter filter = getMultiRowRangeFilter(ranges);
 		if (filter != null) {
 			filterList.addFilter(filter);
-			
+
 			final List<RowRange> rowRanges = filter.getRowRanges();
 			multiScanner.setStartRow(rowRanges.get(
 					0).getStartRow());

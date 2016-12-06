@@ -116,7 +116,7 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 							TEST_BOX_TEMPORAL_FILTER_FILE).toURI().toURL(),
 					new URL[] {
 						new File(
-								 HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
+								HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
 						new File(
 								TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()
 					},
@@ -294,7 +294,7 @@ public class GeoWaveBasicSpatialTemporalVectorIT extends
 					new File(
 							TEST_BOX_TEMPORAL_FILTER_FILE).toURI().toURL(),
 					new URL[] {
-						 new File(
+						new File(
 								HAIL_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL(),
 						new File(
 								TORNADO_TRACKS_EXPECTED_BOX_TEMPORAL_FILTER_RESULTS_FILE).toURI().toURL()

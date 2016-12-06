@@ -186,7 +186,8 @@ public class GeoWaveBasicRasterIT
 
 	private void queryNoDataMergeStrategy(
 			final String coverageName,
-			final int tileSize ) throws IOException {
+			final int tileSize )
+			throws IOException {
 		final DataStore dataStore = dataStoreOptions.createDataStore();
 
 		try (CloseableIterator<?> it = dataStore.query(
