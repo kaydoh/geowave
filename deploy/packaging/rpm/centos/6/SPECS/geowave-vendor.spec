@@ -158,7 +158,7 @@ This package installs the Accumulo components of GeoWave
 %dir %{geowave_install}
 
 %attr(755, hdfs, hdfs) %{geowave_accumulo_home}
-%attr(644, hdfs, hdfs) %{geowave_accumulo_home}/geowave-accumulo.jar
+%attr(644, hdfs, hdfs) %{geowave_accumulo_home}/geowave-accumulo-%{vendor_version}.jar
 %attr(755, hdfs, hdfs) %{geowave_accumulo_home}/deploy-geowave-accumulo-to-hdfs.sh
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,7 +182,7 @@ This package installs the HBase components of GeoWave
 %dir %{geowave_install}
 
 %attr(755, hdfs, hdfs) %{geowave_hbase_home}
-%attr(644, hdfs, hdfs) %{geowave_hbase_home}/geowave-hbase.jar
+%attr(644, hdfs, hdfs) %{geowave_hbase_home}/geowave-hbase-%{vendor_version}.jar
 %attr(755, hdfs, hdfs) %{geowave_hbase_home}/deploy-geowave-hbase-to-hdfs.sh
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

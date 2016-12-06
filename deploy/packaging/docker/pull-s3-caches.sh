@@ -11,6 +11,7 @@ if [ -z $NO_MAVEN_INIT ] && [ ! -d $1/.m2 ]; then
 	tar xf $1/$CACHE_FILE
 	rm -f $1/$CACHE_FILE
 	popd
-	type getenforce >/dev/null 2>&1 &&  getenforce >/dev/null 2>&1 && chcon -Rt svirt_sandbox_file_t $1/.m2;
+	#if run in docker, do the following:
+	#type getenforce >/dev/null 2>&1 &&  getenforce >/dev/null 2>&1 && chcon -Rt svirt_sandbox_file_t $1/.m2;
 	echo "Finished Downloading Maven Cache ..."
 fi
