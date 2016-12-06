@@ -1,3 +1,4 @@
+mkdir -p $WORKSPACE/deploy/target
 mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec > $WORKSPACE/deploy/target/version.txt
 
 # Build and archive HTML/PDF docs
@@ -17,6 +18,5 @@ if [ ! -f $WORKSPACE/docs/target/manpages.tar.gz ]; then
 fi
 ## Copy over the puppet scripts
 if [ ! -f $WORKSPACE/deploy/target/puppet-scripts.tar.gz ]; then
-	mkdir -p $WORKSPACE/deploy/target
     tar -czf $WORKSPACE/deploy/target/puppet-scripts.tar.gz -C $WORKSPACE/deploy/packaging/puppet geowave
 fi
