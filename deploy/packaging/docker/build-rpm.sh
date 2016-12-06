@@ -28,10 +28,15 @@ chmod -R 777 $WORKSPACE/deploy/packaging/rpm
 
 # Staging Artifacts for Build
 cd $WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES
-rm -f *.gz *.jar
-cp /usr/src/geowave/target/site.tar.gz .
-cp /usr/src/geowave/docs/target/manpages.tar.gz .
-cp /usr/src/geowave/deploy/target/*.jar .
+if [ $BUILD_TYPE = "common" ]
+then
+	rm -f *.gz *.jar
+	cp /usr/src/geowave/target/site.tar.gz .
+	cp /usr/src/geowave/docs/target/manpages.tar.gz .
+else
+	cp /usr/src/geowave/deploy/target/*.jar .
+fi
+# both builds have tar.gz
 cp /usr/src/geowave/deploy/target/*.tar.gz .
 cd ..
 
