@@ -9,15 +9,7 @@
 %define _rpmfilename        %%{ARCH}/%%{NAME}.%%{RELEASE}.%%{ARCH}.rpm
 
 %define geowave_home           /usr/local/geowave
-%define geowave_install        /usr/local/%{versioned_app_name}
-%define geowave_accumulo_home  %{geowave_install}/accumulo
-%define geowave_hbase_home     %{geowave_install}/hbase
-%define geowave_docs_home      %{geowave_install}/docs
-%define geowave_geoserver_home %{geowave_install}/geoserver
-%define geowave_tools_home     %{geowave_install}/tools
-%define geowave_plugins_home   %{geowave_tools_home}/plugins
-%define geowave_geoserver_libs %{geowave_geoserver_home}/webapps/geoserver/WEB-INF/lib
-%define geowave_geoserver_data %{geowave_geoserver_home}/data_dir
+%define geowave_docs_home      %{geowave_home}/docs
 %define geowave_config         /etc/geowave
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,6 +38,7 @@ GeoWave provides geospatial and temporal indexing on top of Accumulo and HBase.
 # Copy system service files into place
 mkdir -p %{buildroot}/etc/profile.d
 cp %{SOURCE1} %{buildroot}/etc/profile.d/geowave.sh
+mkdir -p %{buildroot}%{geowave_config}
 
 # Copy documentation into place
 mkdir -p %{buildroot}%{geowave_docs_home}
@@ -94,11 +87,10 @@ fi
 Summary:        GeoWave Documentation
 Group:          Applications/Internet
 Provides:       %{versioned_app_name}-docs = %{version}
-Requires:       %{versioned_app_name}-tools = %{version}
 Requires:       core
 
 %description -n %{versioned_app_name}-docs
-GeoWave provides geospatial and temporal indexing on top of Accumulo.
+GeoWave provides geospatial and temporal indexing on top of Accumulo and HBase.
 This package installs the GeoWave documentation into the GeoWave directory
 
 %files -n       %{versioned_app_name}-docs

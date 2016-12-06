@@ -13,12 +13,10 @@
 %define geowave_install        /usr/local/%{versioned_app_name}
 %define geowave_accumulo_home  %{geowave_install}/accumulo
 %define geowave_hbase_home     %{geowave_install}/hbase
-%define geowave_docs_home      %{geowave_install}/docs
 %define geowave_geoserver_home %{geowave_install}/geoserver
 %define geowave_tools_home     %{geowave_install}/tools
 %define geowave_geoserver_libs %{geowave_geoserver_home}/webapps/geoserver/WEB-INF/lib
 %define geowave_geoserver_data %{geowave_geoserver_home}/data_dir
-%define geowave_config         /etc/geowave
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -64,7 +62,6 @@ rm -fr %{_builddir}/*
 
 %install
 rm -fr %{buildroot}
-mkdir -p %{buildroot}%{geowave_config}
 mkdir -p %{buildroot}%{geowave_accumulo_home}
 mkdir -p %{buildroot}%{geowave_hbase_home}
 
