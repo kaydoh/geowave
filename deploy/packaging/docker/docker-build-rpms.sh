@@ -54,7 +54,6 @@ docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
 	-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
 	-e BUILD_TYPE="common" \
-	-e GEOWAVE_VERSION="${GEOWAVE_VERSION}" \
     -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \

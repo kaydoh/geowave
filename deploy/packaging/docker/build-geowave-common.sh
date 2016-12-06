@@ -1,3 +1,5 @@
+mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec > $WORKSPACE/deploy/target/version.txt
+
 # Build and archive HTML/PDF docs
 if [ ! -f $WORKSPACE/target/site.tar.gz ]; then
     mvn javadoc:aggregate $BUILD_ARGS "$@"
@@ -13,7 +15,6 @@ if [ ! -f $WORKSPACE/docs/target/manpages.tar.gz ]; then
     find $WORKSPACE/docs/target/asciidoc/ -name "*.txt" -exec a2x -d manpage -f manpage {} -D $WORKSPACE/docs/target/manpages \;
     tar -czf $WORKSPACE/docs/target/manpages.tar.gz -C $WORKSPACE/docs/target/manpages/ .
 fi
-
 ## Copy over the puppet scripts
 if [ ! -f $WORKSPACE/deploy/target/puppet-scripts.tar.gz ]; then
 	mkdir -p $WORKSPACE/deploy/target

@@ -10,7 +10,7 @@ if [ ! -z "$BUILD_ARGS" ]; then
 	VENDOR_VERSION=$(echo "$BUILD_ARGS" | grep -oi "vendor.version=\w*" | sed "s/vendor.version=//g")
 fi
 # Get the version from the parent pom
-GEOWAVE_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' -f $WORKSPACE/pom.xml --non-recursive exec:exec)
+GEOWAVE_VERSION=$(cat $WORKSPACE/deploy/target/version.txt)
 
 echo "---------------------------------------------------------------"
 echo "             Building RPM with the following settings"
