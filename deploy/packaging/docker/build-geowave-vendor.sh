@@ -4,7 +4,7 @@
 #
 
 echo "---------------------------------------------------------------"
-echo "         Building GeoWave with the following settings"
+echo "  Building GeoWave Vendor-specific with the following settings"
 echo "---------------------------------------------------------------"
 echo "BUILD_ARGS=${BUILD_ARGS} ${@}"
 echo "---------------------------------------------------------------"

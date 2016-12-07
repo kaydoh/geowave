@@ -9,13 +9,14 @@ VENDOR_VERSION=apache
 if [ ! -z "$BUILD_ARGS" ]; then
 	VENDOR_VERSION=$(echo "$BUILD_ARGS" | grep -oi "vendor.version=\w*" | sed "s/vendor.version=//g")
 fi
-# Get the version from the parent pom
+# Get the version
 GEOWAVE_VERSION=$(cat $WORKSPACE/deploy/target/version.txt)
 
 echo "---------------------------------------------------------------"
 echo "             Building RPM with the following settings"
 echo "---------------------------------------------------------------"
 echo "GEOWAVE_VERSION=${GEOWAVE_VERSION}"
+echo "BUILD_TYPE=${BUILD_TYPE}"
 echo "GEOSERVER_VERSION=${GEOSERVER_VERSION}"
 echo "BUILD_ARGS=${BUILD_ARGS}"
 echo "VENDOR_VERSION=${VENDOR_VERSION}"

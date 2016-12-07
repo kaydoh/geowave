@@ -58,11 +58,19 @@ docker run --rm \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
     "cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh  && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"
-		
+
+docker run --rm \
+    -e WORKSPACE=/usr/src/geowave \
+    -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    ngageoint/geowave-centos6-rpm-build \
+    /bin/bash -c \
+    "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"
+
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
 	export BUILD_ARGS="$build_args"
 	
+	$WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command clean
 	docker run --rm \
 		-e WORKSPACE=/usr/src/geowave \
 		-e BUILD_ARGS="$build_args" \
@@ -81,4 +89,12 @@ do
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
     	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh  && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"
+    
+    docker run --rm \
+    	-e WORKSPACE=/usr/src/geowave \
+    	-e BUILD_ARGS="$build_args" \
+    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    	ngageoint/geowave-centos6-rpm-build \
+    	/bin/bash -c \
+    	"cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"	
 done
