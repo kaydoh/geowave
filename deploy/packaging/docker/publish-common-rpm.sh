@@ -4,19 +4,19 @@
 # reindexing the existing rpm repo
 #
 # Get the SCM version
-BUILD_NUMBER=$(cat $WORKSPACE/deploy/target/buildnumber.txt)
+TIME_TAG=$(date +"%Y%m%d%H%M")
 # Get the version
 GEOWAVE_VERSION=$(cat $WORKSPACE/deploy/target/version.txt)
 echo "---------------------------------------------------------------"
 echo "         Publishing GeoWave Common RPMs"
 echo "GEOWAVE_VERSION=${GEOWAVE_VERSION}"
-echo "BUILD_NUMBER=${BUILD_NUMBER}"
+echo "TIME_TAG=${TIME_TAG}"
 echo "---------------------------------------------------------------"
 
+
+echo "###### Build Variables"
+
 set -x
-
-echo '###### Build Variables'
-
 declare -A ARGS
 while [ $# -gt 0 ]; do
     # Trim the first two chars off of the arg name ex: --foo
@@ -45,7 +45,7 @@ fi
 
 # Archive things, copy some artifacts up to AWS if available and get rid of our temp area
 cd ..
-tar cvzf geowave-$GEOWAVE_VERSION-${BUILD_NUMBER:0:7}.tar.gz geowave
+tar cvzf geowave-$GEOWAVE_VERSION-${TIME_TAG}.tar.gz geowave
 
 rm -rf geowave
 

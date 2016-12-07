@@ -4,8 +4,7 @@
 # reindexing the existing rpm repo
 #
 
-# Set a default version
-BUILD_NUMBER=$(cat $WORKSPACE/deploy/target/buildnumber.txt)
+TIME_TAG=$(date +"%Y%m%d%H%M")
 # Get the version
 GEOWAVE_VERSION=$(cat $WORKSPACE/deploy/target/version.txt)
 VENDOR_VERSION=apache
@@ -16,7 +15,7 @@ fi
 echo "---------------------------------------------------------------"
 echo "         Publishing GeoWave Vendor-specific RPMs"
 echo "GEOWAVE_VERSION=${GEOWAVE_VERSION}"
-echo "BUILD_NUMBER=${BUILD_NUMBER}"
+echo "TIME_TAG=${TIME_TAG}"
 echo "VENDOR_VERSION=${VENDOR_VERSION}"
 echo "BUILD_ARGS=${BUILD_ARGS}"
 echo "---------------------------------------------------------------"
@@ -49,12 +48,12 @@ unzip -p geowave-accumulo-${GEOWAVE_VERSION}-${VENDOR_VERSION}.jar build.propert
 
 # Archive things, copy some artifacts up to AWS if available and get rid of our temp area
 cd ..
-tar cvzf geowave-${GEOWAVE_VERSION}-${VENDOR_VERSION}-${BUILD_NUMBER:0:7}.tar.gz geowave
+tar cvzf geowave-${GEOWAVE_VERSION}-${VENDOR_VERSION}-${TIME_TAG}.tar.gz geowave
 
 rm -rf geowave
 
 # Copy the Jace artifacts
-cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-jace-${GEOWAVE_VERSION}-${VENDOR_VERSION}.tar.gz ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave-jace-${VENDOR_VERSION}-${GEOWAVE_VERSION}-${BUILD_NUMBER:0:7}.tar.gz
+cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-jace-${GEOWAVE_VERSION}-${VENDOR_VERSION}.tar.gz ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave-jace-${VENDOR_VERSION}-${GEOWAVE_VERSION}-${TIME_TAG}.tar.gz
 
 echo '###### Copy rpm to repo and reindex'
 
@@ -64,9 +63,8 @@ cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SRPMS/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo
 cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/TARBALL/
 if [ ${ARGS[buildtype]} = "dev" ]
 then
-	NOW=$(date +"%Y%m%d%H%M")
 	pushd ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/
-	for i in *.jar; do cp "${i}" ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}-jars/JAR/"${i%.jar}-${NOW}.jar" ; done
+	for i in *.jar; do cp "${i}" ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}-jars/JAR/"${i%.jar}-${TIME_TAG}.jar" ; done
 	popd
 else	
 	cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/*.jar ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}-jars/JAR/
