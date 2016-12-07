@@ -11,6 +11,6 @@ then
     git clone https://github.com/jwomeara/jace.git;
     cd jace;
     git checkout tags/v1.3.0;
-    mvn -q clean install -Dsources "$@"
+    mvn -o -q clean install -Dsources "$@"
     cd ../..;
 fi 

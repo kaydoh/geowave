@@ -3,13 +3,13 @@ echo "---------------------------------------------------------------"
 echo "         Building GeoWave Common"
 echo "---------------------------------------------------------------"
 mkdir -p $WORKSPACE/deploy/target
-mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec | sed -e 's/"//g' -e 's/-SNAPSHOT//g' > $WORKSPACE/deploy/target/version.txt
-mvn -q -Dexec.executable="echo" -Dexec.args='${buildNumber}' --non-recursive -f $WORKSPACE/deploy/pom.xml exec:exec > $WORKSPACE/deploy/target/buildnumber.txt
+mvn -q -o -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec | sed -e 's/"//g' -e 's/-SNAPSHOT//g' > $WORKSPACE/deploy/target/version.txt
+mvn -q -o -Dexec.executable="echo" -Dexec.args='${buildNumber}' --non-recursive -f $WORKSPACE/deploy/pom.xml exec:exec > $WORKSPACE/deploy/target/buildnumber.txt
 
 # Build and archive HTML/PDF docs
 if [ ! -f $WORKSPACE/target/site.tar.gz ]; then
-    mvn javadoc:aggregate $BUILD_ARGS "$@"
-    mvn -P docs -pl docs install $BUILD_ARGS "$@"
+    mvn -o javadoc:aggregate $BUILD_ARGS "$@"
+    mvn -o -P docs -pl docs install $BUILD_ARGS "$@"
     tar -czf $WORKSPACE/target/site.tar.gz -C $WORKSPACE/target site
 fi
 
