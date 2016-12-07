@@ -118,7 +118,7 @@ This package installs the geowave Puppet module to /etc/puppet/modules
 
 %changelog
 * Fri Nov 23 2016 Rich Fecher <rfecher@gmail.com> - 0.9.3
-- Add geowave-hbase
+- Refactor to separate vendor-specific and common rpms
 * Fri Jun 5 2015 Andrew Spohn <andrew.e.spohn.ctr@nga.mil> - 0.8.7-1
 - Add external config file
 * Fri May 22 2015 Andrew Spohn <andrew.e.spohn.ctr@nga.mil> - 0.8.7

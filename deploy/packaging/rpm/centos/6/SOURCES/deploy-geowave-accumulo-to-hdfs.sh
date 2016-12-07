@@ -121,13 +121,13 @@ if [ $? -ne 0 ]; then # Try creating
 fi
 
 # Check to see if the library is already present and remove if so (put will not replace)
-su $HDFS_USER -c "hadoop fs -ls $ACCUMULO_LIB_DIR/geowave-accumulo.jar"
+su $HDFS_USER -c "hadoop fs -ls $ACCUMULO_LIB_DIR/geowave-accumulo-$VENDOR_VERSION.jar"
 if [ $? -eq 0 ]; then
-    su $HDFS_USER -c "hadoop fs -rm $ACCUMULO_LIB_DIR/geowave-accumulo.jar"
+    su $HDFS_USER -c "hadoop fs -rm $ACCUMULO_LIB_DIR/geowave-accumulo-$VENDOR_VERSION.jar"
 fi
 
 # Upload library to hdfs
-su $HDFS_USER -c "hadoop fs -put $GEOWAVE_ACCUMULO_HOME/geowave-accumulo.jar $ACCUMULO_LIB_DIR/geowave-accumulo.jar"
+su $HDFS_USER -c "hadoop fs -put $GEOWAVE_ACCUMULO_HOME/geowave-accumulo-$VENDOR_VERSION.jar $ACCUMULO_LIB_DIR/geowave-accumulo-$VENDOR_VERSION.jar"
 if [ $? -ne 0 ]; then
     echo >&2 "Unable to upload geowave-accumulo.jar into hdfs. Aborting."; exit 1;
 fi

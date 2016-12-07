@@ -62,6 +62,15 @@ LOCAL_REPO_DIR=/var/www/html/repos/snapshots
 cp -R ${WORKSPACE}/${ARGS[buildroot]}/RPMS/${ARGS[arch]}/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
 cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SRPMS/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/SRPMS/
 cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/TARBALL/
+if [ ${ARGS[buildtype] = "dev" ]
+then
+	NOW=$(date +"%Y%m%d%H%M")
+	pushd ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/
+	for i in *.jar; do cp "${i}" ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}-jars/JAR/"${i%.jar}-${NOW}.jar" ; done
+	popd
+else	
+	cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/*.jar ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}-jars/JAR/
+fi
 
 # When several processes run createrepo concurrently they will often fail with problems trying to
 # access index files that are in the process of being overwritten by the other processes. The command

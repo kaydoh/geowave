@@ -15,6 +15,7 @@
 %define geowave_hbase_home     %{geowave_install}/hbase
 %define geowave_geoserver_home %{geowave_install}/geoserver
 %define geowave_tools_home     %{geowave_install}/tools
+%define geowave_plugins_home   %{geowave_tools_home}/plugins
 %define geowave_geoserver_libs %{geowave_geoserver_home}/webapps/geoserver/WEB-INF/lib
 %define geowave_geoserver_data %{geowave_geoserver_home}/data_dir
 
@@ -28,18 +29,19 @@ BuildArch:      noarch
 Summary:        GeoWave provides geospatial and temporal indexing on top of Accumulo and HBase
 License:        Apache2
 Group:          Applications/Internet
-Source0:        geowave-accumulo-%{vendor_version}.jar
+Source0:        geowave-accumulo-%{version}-%{vendor_version}.jar
 Source1:        deploy-geowave-accumulo-to-hdfs.sh
-Source2:        geowave-hbase-%{vendor_version}.jar
+Source2:        geowave-hbase-%{version}-%{vendor_version}.jar
 Source3:        deploy-geowave-hbase-to-hdfs.sh
 Source4:        geoserver.zip
-Source5:        geowave-geoserver-%{vendor_version}.jar
+Source5:        geowave-geoserver-%{version}-%{vendor_version}.jar
 Source6:        geowave-logrotate.sh
 Source7:        geowave-init.sh
 Source8:        default.xml
 Source9:        namespace.xml
 Source10:       workspace.xml
-Source11:       geowave-tools-%{vendor_version}.jar
+Source11:       geowave-tools-%{version}-%{vendor_version}.jar
+Source12:       geowave-tools.sh
 BuildRequires:  unzip
 BuildRequires:  zip
 BuildRequires:  xmlto
@@ -78,7 +80,7 @@ unzip -qq  %{SOURCE4} -d %{buildroot}%{geowave_install}
 mv %{buildroot}%{geowave_geoserver_home}-* %{buildroot}%{geowave_geoserver_home}
 
 # patch some config settings
-sed -i 's/yyyy_mm_dd.//g' %{buildroot}%{geowave_geoserver_home}/etc/jetty.xml
+sed -i 's/yyyy_mm_dd.//g' %{buildroot}%{geowave_geoserver_home}/etc/jetty-http.xml
 
 # Remove cruft we don't want in our deployment
 rm -fr %{buildroot}%{geowave_geoserver_home}/bin/*.bat
@@ -107,11 +109,14 @@ mkdir -p %{buildroot}%{geowave_tools_home}
 cp %{SOURCE11} %{buildroot}%{geowave_tools_home}
 cp %{buildroot}%{geowave_accumulo_home}/geowave-accumulo-build.properties %{buildroot}%{geowave_tools_home}/build.properties
 pushd %{buildroot}%{geowave_tools_home}
-zip -qg %{buildroot}%{geowave_tools_home}/geowave-tools-%{vendor_version}.jar build.properties
+zip -qg %{buildroot}%{geowave_tools_home}/geowave-tools-%{version}-%{vendor_version}.jar build.properties
 popd
 mv %{buildroot}%{geowave_tools_home}/build.properties %{buildroot}%{geowave_tools_home}/geowave-tools-build.properties
-unzip -p %{SOURCE11} geowave-tools.sh > %{buildroot}%{geowave_tools_home}/geowave-tools.sh
-
+#replace vendor-version particular variables in geowave-tools.sh
+sed -i -e s/'$GEOWAVE_TOOLS_HOME'/%{geowave_tools_home}/g %{SOURCE12}
+sed -i -e s/'$GEOWAVE_TOOLS_JAR'/%{Source11}/g %{SOURCE12}
+cp  %{SOURCE12} %{buildroot}%{geowave_tools_home}
+mkdir -p %{buildroot}%{geowave_plugins_home}
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -152,7 +157,7 @@ This package installs the Accumulo components of GeoWave
 %dir %{geowave_install}
 
 %attr(755, hdfs, hdfs) %{geowave_accumulo_home}
-%attr(644, hdfs, hdfs) %{geowave_accumulo_home}/geowave-accumulo-%{vendor_version}.jar
+%attr(644, hdfs, hdfs) %{geowave_accumulo_home}/geowave-accumulo-%{version}-%{vendor_version}.jar
 %attr(755, hdfs, hdfs) %{geowave_accumulo_home}/deploy-geowave-accumulo-to-hdfs.sh
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,7 +181,7 @@ This package installs the HBase components of GeoWave
 %dir %{geowave_install}
 
 %attr(755, hdfs, hdfs) %{geowave_hbase_home}
-%attr(644, hdfs, hdfs) %{geowave_hbase_home}/geowave-hbase-%{vendor_version}.jar
+%attr(644, hdfs, hdfs) %{geowave_hbase_home}/geowave-hbase-%{version}-%{vendor_version}.jar
 %attr(755, hdfs, hdfs) %{geowave_hbase_home}/deploy-geowave-hbase-to-hdfs.sh
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -250,7 +255,7 @@ fi
 
 %changelog
 * Fri Nov 23 2016 Rich Fecher <rfecher@gmail.com> - 0.9.3
-- Add geowave-hbase
+- Add geowave-hbase and refactor to separate vendor-specific and common rpms
 * Fri Jun 5 2015 Andrew Spohn <andrew.e.spohn.ctr@nga.mil> - 0.8.7-1
 - Add external config file
 * Fri May 22 2015 Andrew Spohn <andrew.e.spohn.ctr@nga.mil> - 0.8.7

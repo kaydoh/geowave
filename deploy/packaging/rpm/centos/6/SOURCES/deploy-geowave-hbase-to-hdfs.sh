@@ -120,13 +120,13 @@ if [ $? -ne 0 ]; then # Try creating
 fi
 
 # Check to see if the library is already present and remove if so (put will not replace)
-su $HDFS_USER -c "hadoop fs -ls $HBASE_LIB_DIR/geowave-hbase.jar"
+su $HDFS_USER -c "hadoop fs -ls $HBASE_LIB_DIR/geowave-hbase-$VENDOR_VERSION.jar"
 if [ $? -eq 0 ]; then
-    su $HDFS_USER -c "hadoop fs -rm $HBASE_LIB_DIR/geowave-hbase.jar"
+    su $HDFS_USER -c "hadoop fs -rm $HBASE_LIB_DIR/geowave-hbase-$VENDOR_VERSION.jar"
 fi
 
 # Upload library to hdfs
-su $HDFS_USER -c "hadoop fs -put $GEOWAVE_HBASE_HOME/geowave-hbase.jar $HBASE_LIB_DIR/geowave-hbase.jar"
+su $HDFS_USER -c "hadoop fs -put $GEOWAVE_HBASE_HOME/geowave-hbase-$VENDOR_VERSION.jar $HBASE_LIB_DIR/geowave-hbase-$VENDOR_VERSION.jar"
 if [ $? -ne 0 ]; then
     echo >&2 "Unable to upload geowave-hbase.jar into hdfs. Aborting."; exit 1;
 fi
