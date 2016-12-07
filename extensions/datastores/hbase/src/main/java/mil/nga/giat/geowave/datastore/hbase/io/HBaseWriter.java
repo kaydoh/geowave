@@ -32,7 +32,8 @@ import org.apache.log4j.Logger;
 public class HBaseWriter implements
 		Writer<RowMutations>
 {
-	private final static Logger LOGGER = Logger.getLogger(HBaseWriter.class);
+	private final static Logger LOGGER = Logger.getLogger(
+			HBaseWriter.class);
 	private final TableName tableName;
 	private final Admin admin;
 	private static final long SLEEP_INTERVAL_FOR_CF_VERIFY = 100L;
@@ -46,7 +47,8 @@ public class HBaseWriter implements
 			final Admin admin,
 			final String tableName ) {
 		this.admin = admin;
-		this.tableName = TableName.valueOf(tableName);
+		this.tableName = TableName.valueOf(
+				tableName);
 
 		cfMap = new HashMap<String, Boolean>();
 
@@ -55,12 +57,14 @@ public class HBaseWriter implements
 				false);
 
 		if (LOGGER.getLevel() == Level.DEBUG) {
-			LOGGER.debug("Schema Update Enabled = " + schemaUpdateEnabled);
+			LOGGER.debug(
+					"Schema Update Enabled = " + schemaUpdateEnabled);
 
 			final String check = admin.getConfiguration().get(
 					"hbase.online.schema.update.enable");
 			if (check == null) {
-				LOGGER.debug("'hbase.online.schema.update.enable' property should be true for best performance");
+				LOGGER.debug(
+						"'hbase.online.schema.update.enable' property should be true for best performance");
 			}
 		}
 	}
@@ -71,17 +75,22 @@ public class HBaseWriter implements
 			final BufferedMutatorParams params = new BufferedMutatorParams(
 					tableName);
 
-			params.listener(new ExceptionListener() {
-				@Override
-				public void onException(
-						final RetriesExhaustedWithDetailsException exception,
-						final BufferedMutator mutator )
-						throws RetriesExhaustedWithDetailsException {
-					LOGGER.error(
-							"Error in buffered mutator",
-							exception);
-				}
-			});
+			params.listener(
+					new ExceptionListener() {
+						@Override
+						public void onException(
+								final RetriesExhaustedWithDetailsException exception,
+								final BufferedMutator mutator )
+								throws RetriesExhaustedWithDetailsException {
+							LOGGER.error(
+									"Error in buffered mutator",
+									exception);
+							// Get details
+							for (Throwable cause : exception.getCauses()) {
+								cause.printStackTrace();
+							}
+						}
+					});
 			mutator = admin.getConnection().getBufferedMutator(
 					params);
 
@@ -107,7 +116,8 @@ public class HBaseWriter implements
 	public void write(
 			final Iterable<RowMutations> mutations ) {
 		for (final RowMutations rowMutation : mutations) {
-			write(rowMutation);
+			write(
+					rowMutation);
 		}
 	}
 
@@ -130,10 +140,12 @@ public class HBaseWriter implements
 			final Iterable<RowMutations> iterable,
 			final String columnFamily )
 			throws IOException {
-		addColumnFamilyIfNotExist(columnFamily);
+		addColumnFamilyIfNotExist(
+				columnFamily);
 
 		for (final RowMutations rowMutation : iterable) {
-			write(rowMutation);
+			write(
+					rowMutation);
 		}
 	}
 
@@ -141,7 +153,8 @@ public class HBaseWriter implements
 			final List<Put> puts,
 			final String columnFamily )
 			throws IOException {
-		addColumnFamilyIfNotExist(columnFamily);
+		addColumnFamilyIfNotExist(
+				columnFamily);
 
 		getBufferedMutator().mutate(
 				puts);
@@ -151,7 +164,8 @@ public class HBaseWriter implements
 			final String columnFamily )
 			throws IOException {
 		synchronized (BasicHBaseOperations.ADMIN_MUTEX) {
-			if (!columnFamilyExists(columnFamily)) {
+			if (!columnFamilyExists(
+					columnFamily)) {
 				addColumnFamilyToTable(
 						tableName,
 						columnFamily);
@@ -163,7 +177,8 @@ public class HBaseWriter implements
 			final RowMutations mutation,
 			final String columnFamily ) {
 		try {
-			addColumnFamilyIfNotExist(columnFamily);
+			addColumnFamilyIfNotExist(
+					columnFamily);
 		}
 		catch (final IOException e) {
 			LOGGER.warn(
@@ -171,7 +186,8 @@ public class HBaseWriter implements
 					e);
 		}
 
-		write(mutation);
+		write(
+				mutation);
 	}
 
 	private boolean columnFamilyExists(
@@ -179,21 +195,27 @@ public class HBaseWriter implements
 		Boolean found = false;
 
 		try {
-			found = cfMap.get(columnFamily);
+			found = cfMap.get(
+					columnFamily);
 
 			if (found == null) {
 				found = Boolean.FALSE;
 			}
 
 			if (!found) {
-				if (!schemaUpdateEnabled && !admin.isTableEnabled(tableName)) {
-					admin.enableTable(tableName);
+				if (!schemaUpdateEnabled && !admin.isTableEnabled(
+						tableName)) {
+					admin.enableTable(
+							tableName);
 				}
 
 				// update the table descriptor
-				HTableDescriptor tableDescriptor = admin.getTableDescriptor(tableName);
+				HTableDescriptor tableDescriptor = admin.getTableDescriptor(
+						tableName);
 
-				found = tableDescriptor.hasFamily(columnFamily.getBytes(StringUtils.UTF8_CHAR_SET));
+				found = tableDescriptor.hasFamily(
+						columnFamily.getBytes(
+								StringUtils.UTF8_CHAR_SET));
 
 				cfMap.put(
 						columnFamily,
@@ -213,13 +235,16 @@ public class HBaseWriter implements
 			final TableName tableName,
 			final String columnFamilyName )
 			throws IOException {
-		LOGGER.debug("Creating column family: " + columnFamilyName);
+		LOGGER.debug(
+				"Creating column family: " + columnFamilyName);
 
 		final HColumnDescriptor cfDescriptor = new HColumnDescriptor(
 				columnFamilyName);
 
-		if (!schemaUpdateEnabled && !admin.isTableDisabled(tableName)) {
-			admin.disableTable(tableName);
+		if (!schemaUpdateEnabled && !admin.isTableDisabled(
+				tableName)) {
+			admin.disableTable(
+					tableName);
 		}
 
 		// Try adding column family to the table descriptor instead
@@ -230,7 +255,8 @@ public class HBaseWriter implements
 		if (schemaUpdateEnabled) {
 			do {
 				try {
-					Thread.sleep(SLEEP_INTERVAL_FOR_CF_VERIFY);
+					Thread.sleep(
+							SLEEP_INTERVAL_FOR_CF_VERIFY);
 				}
 				catch (final InterruptedException e) {
 					LOGGER.warn(
@@ -247,7 +273,8 @@ public class HBaseWriter implements
 
 		// Enable table once done
 		if (!schemaUpdateEnabled) {
-			admin.enableTable(tableName);
+			admin.enableTable(
+					tableName);
 		}
 	}
 
@@ -255,7 +282,8 @@ public class HBaseWriter implements
 			final Iterable<RowMutations> iterable )
 			throws IOException {
 		for (final RowMutations rowMutation : iterable) {
-			write(rowMutation);
+			write(
+					rowMutation);
 		}
 	}
 

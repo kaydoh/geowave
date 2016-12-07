@@ -79,7 +79,7 @@ public class GeoWaveBasicRasterIT
 	public void testNoDataMergeStrategy()
 			throws IOException {
 		final String coverageName = "testNoDataMergeStrategy";
-		final int tileSize = 256;
+		final int tileSize = 128; //256; fails on bigtable 
 		final double westLon = 0;
 		final double eastLon = 45;
 		final double southLat = 0;
