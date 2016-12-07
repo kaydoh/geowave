@@ -10,6 +10,7 @@ DOCKER_ROOT=$WORKSPACE/docker-root
 SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
 GEOSERVER_ARTIFACT=$WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES/geoserver.zip
+LOCAL_REPO_DIR=/var/www/html/repos/snapshots
 
 if [ -z $GEOSERVER_DOWNLOAD_BASE ]; then
 	GEOSERVER_DOWNLOAD_BASE=https://s3.amazonaws.com/geowave-deploy/third-party-downloads/geoserver
@@ -61,7 +62,8 @@ docker run --rm \
 
 docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
-    -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    -e LOCAL_REPO_DIR="$LOCAL_REPO_DIR" \
+    -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave -v $LOCAL_REPO_DIR:/usr/src/repo \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
     "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"
@@ -93,7 +95,8 @@ do
     docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
-    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    	-e LOCAL_REPO_DIR="$LOCAL_REPO_DIR" \
+    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave -v $LOCAL_REPO_DIR:/usr/src/repo \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
     	"cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"	
