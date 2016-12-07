@@ -62,7 +62,7 @@ docker run --rm \
 
 docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
-    -e LOCAL_REPO_DIR="$LOCAL_REPO_DIR" \
+    -e LOCAL_REPO_DIR=/usr/src/repo \
     -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave -v $LOCAL_REPO_DIR:/usr/src/repo \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
@@ -95,7 +95,7 @@ do
     docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
-    	-e LOCAL_REPO_DIR="$LOCAL_REPO_DIR" \
+    	-e LOCAL_REPO_DIR=/usr/src/repo \
     	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave -v $LOCAL_REPO_DIR:/usr/src/repo \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
