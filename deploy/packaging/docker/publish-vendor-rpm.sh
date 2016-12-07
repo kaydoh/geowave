@@ -45,16 +45,16 @@ rpm2cpio *.rpm | cpio -idmv
 rm -f *.rpm *.xml *.spec
 
 # Extract the build metadata from one of the artifacts
-unzip -p geowave-accumulo-${VENDOR_VERSION}.jar build.properties > build.properties
+unzip -p geowave-accumulo-${GEOWAVE_VERSION}-${VENDOR_VERSION}.jar build.properties > build.properties
 
 # Archive things, copy some artifacts up to AWS if available and get rid of our temp area
 cd ..
-tar cvzf geowave-${VENDOR_VERSION}-${GEOWAVE_VERSION}-${BUILD_NUMBER:0:7}.tar.gz geowave
+tar cvzf geowave-${GEOWAVE_VERSION}-${VENDOR_VERSION}-${BUILD_NUMBER:0:7}.tar.gz geowave
 
 rm -rf geowave
 
 # Copy the Jace artifacts
-cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-jace-${VENDOR_VERSION}.tar.gz ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave-jace-${VENDOR_VERSION}-${GEOWAVE_VERSION}-${BUILD_NUMBER:0:7}.tar.gz
+cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-jace-${GEOWAVE_VERSION}-${VENDOR_VERSION}.tar.gz ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave-jace-${VENDOR_VERSION}-${GEOWAVE_VERSION}-${BUILD_NUMBER:0:7}.tar.gz
 
 echo '###### Copy rpm to repo and reindex'
 
@@ -62,7 +62,7 @@ LOCAL_REPO_DIR=/var/www/html/repos/snapshots
 cp -R ${WORKSPACE}/${ARGS[buildroot]}/RPMS/${ARGS[arch]}/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
 cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SRPMS/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/SRPMS/
 cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/TARBALL/
-if [ ${ARGS[buildtype] = "dev" ]
+if [ ${ARGS[buildtype]} = "dev" ]
 then
 	NOW=$(date +"%Y%m%d%H%M")
 	pushd ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/
