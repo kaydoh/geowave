@@ -75,7 +75,7 @@ public class BigtableStoreTestEnvironment extends
 		}
 
 		// Bigtable IT's rely on an external gcloud emulator
-		// initGcloud();
+		initGcloud();
 	}
 
 	// Currently being run from travis externally
@@ -93,12 +93,6 @@ public class BigtableStoreTestEnvironment extends
 
 		String cmdOut = executeCommand(
 				processDir + "/gcloud-init.sh");
-		LOGGER.warn(
-				cmdOut);
-
-		String sourceIt = "/bin/bash -c " + processDir + "/exportBigtableEnv";
-		String srcOut = executeCommand(
-				sourceIt);
 		LOGGER.warn(
 				cmdOut);
 	}
