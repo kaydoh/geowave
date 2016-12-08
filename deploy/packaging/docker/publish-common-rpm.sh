@@ -62,6 +62,6 @@ cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS
 # below uses two utilities that will cause calls to createrepo (from this script) to wait to gain an
 # exclusive file lock before proceeding with a maximum wait time set at 10 minutes before they give
 # up and fail. the ha* commands are from the hatools rpm available via EPEL.
-#/usr/bin/hatimerun -t 10:00 \
-#/usr/bin/halockrun /var/lock/subsys/rpmrepo \
-/usr/bin/createrepo --update --workers 2 ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
+hatimerun -t 10:00 \
+halockrun /var/lock/subsys/rpmrepo \
+createrepo --update --workers 2 ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
