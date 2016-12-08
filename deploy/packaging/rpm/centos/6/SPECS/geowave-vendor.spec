@@ -1,4 +1,4 @@
-%define timestamp           %{?_time_tag}%{!?_time_tag: %(date +%Y%m%d%H%M)}
+%define timestamp           %{?_timestamp}%{!?_timestamp: %(date +%Y%m%d%H%M)}
 %define version             %{?_version}%{!?_version: UNKNOWN}
 %define vendor_version      %{?_vendor_version}%{!?_vendor_version: UNKNOWN}
 %define base_name           geowave
