@@ -19,6 +19,11 @@ EOF
 Y
 EOF
 
+	# get the current PID and kill it after a short wait
+	PID=$!
+	sleep 30
+	kill $PID
+	
 	# run the following steps after this script completes:
 	# start the emulator
 	#./google-cloud-sdk/bin/gcloud beta emulators bigtable start --host-port localhost:8128 &
