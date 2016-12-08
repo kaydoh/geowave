@@ -9,9 +9,13 @@ trap 'chmod -R 777 $WORKSPACE/deploy/packaging/rpm' EXIT
 
 # Get the version
 GEOWAVE_VERSION=$(cat $WORKSPACE/deploy/target/version.txt)
+BUILD_TYPE=$(cat $WORKSPACE/deploy/target/build-type.txt)
+GEOWAVE_VERSION_URL=$(cat $WORKSPACE/deploy/target/version-url.txt)
 echo "---------------------------------------------------------------"
 echo "         Publishing GeoWave Common RPMs"
 echo "GEOWAVE_VERSION=${GEOWAVE_VERSION}"
+echo "GEOWAVE_VERSION_URL=${GEOWAVE_VERSION_URL}"
+echo "BUILD_TYPE=${BUILD_TYPE}"
 echo "TIME_TAG=${TIME_TAG}"
 echo "---------------------------------------------------------------"
 
@@ -27,6 +31,11 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+
+if [ ${BUILD_TYPE} = "dev" ]
+then
+	TIME_TAG_STR="-${TIME_TAG}"
+fi
 echo '###### Build tarball distribution archive'
 
 # Copy the SRPM into an extract directory
@@ -42,21 +51,21 @@ tar xzf site.tar.gz --strip-components=1  site/documentation.pdf
 
 # Push our compiled docs to S3 if aws command has been installed
 if command -v aws >/dev/null 2>&1 ; then
-    aws s3 cp site/documentation.pdf s3://geowave/docs/
-    aws s3 cp site/documentation.pdf s3://geowave/docs/
+	aws s3 cp site/documentation.pdf s3://geowave/${GEOWAVE_VERSION_URL}/docs/
 fi
 
 # Archive things, copy some artifacts up to AWS if available and get rid of our temp area
 cd ..
-tar cvzf geowave-$GEOWAVE_VERSION-${TIME_TAG}.tar.gz geowave
+
+tar cvzf geowave-${GEOWAVE_VERSION}${TIME_TAG_STR}.tar.gz geowave
 
 rm -rf geowave
 
 echo '###### Copy rpm to repo and reindex'
 
-cp -R ${WORKSPACE}/${ARGS[buildroot]}/RPMS/${ARGS[arch]}/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
-cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SRPMS/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/SRPMS/
-cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/TARBALL/
+cp -R ${WORKSPACE}/${ARGS[buildroot]}/RPMS/${ARGS[arch]}/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}/${ARGS[arch]}/
+cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SRPMS/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}/SRPMS/
+cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}/TARBALL/
 
 # When several processes run createrepo concurrently they will often fail with problems trying to
 # access index files that are in the process of being overwritten by the other processes. The command
@@ -65,4 +74,4 @@ cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS
 # up and fail. the ha* commands are from the hatools rpm available via EPEL.
 hatimerun -t 10:00 \
 halockrun -c ${LOCK_DIR}/rpmrepo \
-createrepo --update --workers 2 ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
+createrepo --update --workers 2 ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}/${ARGS[arch]}/

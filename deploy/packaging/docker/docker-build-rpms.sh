@@ -54,7 +54,7 @@ docker run --rm \
 docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
 	-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
-	-e BUILD_TYPE="common" \
+	-e BUILD_SUFFIX="common" \
 	-e TIME_TAG="$TIME_TAG" \
     -v $DOCKER_ROOT:/root \
     -v $WORKSPACE:/usr/src/geowave \
@@ -66,13 +66,14 @@ docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
     -e LOCAL_REPO_DIR=/usr/src/repo \
     -e LOCK_DIR=/usr/src/lock \
+	-e TIME_TAG="$TIME_TAG" \
     -v $DOCKER_ROOT:/root \
     -v $WORKSPACE:/usr/src/geowave \
     -v $LOCAL_REPO_DIR:/usr/src/repo \
     -v $LOCK_DIR:/usr/src/lock \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
-    "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev --time-tag $TIME_TAG"
+    "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave"
 
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
@@ -93,7 +94,7 @@ do
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
 		-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
-		-e BUILD_TYPE="vendor" \
+		-e BUILD_SUFFIX="vendor" \
 		-e TIME_TAG="$TIME_TAG" \
     	-v $DOCKER_ROOT:/root \
     	-v $WORKSPACE:/usr/src/geowave \
@@ -107,11 +108,12 @@ do
     	-e BUILD_ARGS="$build_args" \
     	-e LOCAL_REPO_DIR=/usr/src/repo \
     	-e LOCK_DIR=/usr/src/lock \
+		-e TIME_TAG="$TIME_TAG" \
     	-v $DOCKER_ROOT:/root \
     	-v $WORKSPACE:/usr/src/geowave \
     	-v $LOCAL_REPO_DIR:/usr/src/repo \
     	-v $LOCK_DIR:/usr/src/lock \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
-    "cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev --time-tag $TIME_TAG"	
+    	"cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave"	
 done

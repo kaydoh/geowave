@@ -10,8 +10,18 @@ echo "---------------------------------------------------------------"
 echo "         Building GeoWave Common"
 echo "---------------------------------------------------------------"
 mkdir -p $WORKSPACE/deploy/target
-mvn -q -o -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec | sed -e 's/"//g' -e 's/-SNAPSHOT//g' > $WORKSPACE/deploy/target/version.txt
-
+GEOWAVE_VERSION_STR = $(mvn -q -o -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec)
+echo ${GEOWAVE_VERSION_STR} | sed -e 's/"//g' -e 's/-SNAPSHOT//g' > $WORKSPACE/deploy/target/version.txt
+if [ $GEOWAVE_VERSION_STR == *"-SNAPSHOT"* ]
+then
+	#its a dev/latest build
+	echo "dev" > $WORKSPACE/deploy/target/build-type.txt
+	echo "latest" > $WORKSPACE/deploy/target/version-url.txt
+else
+	#its a release
+	echo "release" > $WORKSPACE/deploy/target/build-type.txt
+	echo $GEOWAVE_VERSION_STR > $WORKSPACE/deploy/target/version-url.txt
+fi
 # Build and archive HTML/PDF docs
 if [ ! -f $WORKSPACE/target/site.tar.gz ]; then
     mvn -o javadoc:aggregate $BUILD_ARGS "$@"
