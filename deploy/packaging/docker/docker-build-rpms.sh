@@ -45,7 +45,8 @@ $WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command clean
 docker run --rm \
 	-e WORKSPACE=/usr/src/geowave \
 	-e MAVEN_OPTS="-Xmx1500m" \
-	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+	-v $DOCKER_ROOT:/root \
+	-v $WORKSPACE:/usr/src/geowave \
 	ngageoint/geowave-centos6-java8-build \
 	/bin/bash -c \
 	"cd \$WORKSPACE && deploy/packaging/docker/build-geowave-common.sh $SKIP_EXTRA"
@@ -55,7 +56,8 @@ docker run --rm \
 	-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
 	-e BUILD_TYPE="common" \
 	-e TIME_TAG="$TIME_TAG" \
-    -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    -v $DOCKER_ROOT:/root \
+    -v $WORKSPACE:/usr/src/geowave \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
     "cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh"
@@ -64,7 +66,8 @@ docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
     -e LOCAL_REPO_DIR=/usr/src/repo \
     -e LOCK_DIR=/usr/src/lock \
-    -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    -v $DOCKER_ROOT:/root \
+    -v $WORKSPACE:/usr/src/geowave \
     -v $LOCAL_REPO_DIR:/usr/src/repo \
     -v $LOCK_DIR:/usr/src/lock \
     ngageoint/geowave-centos6-rpm-build \
@@ -80,7 +83,8 @@ do
 		-e WORKSPACE=/usr/src/geowave \
 		-e BUILD_ARGS="$build_args" \
 		-e MAVEN_OPTS="-Xmx1500m" \
-		-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+		-v $DOCKER_ROOT:/root \
+		-v $WORKSPACE:/usr/src/geowave \
 		ngageoint/geowave-centos6-java8-build \
 		/bin/bash -c \
 		"cd \$WORKSPACE && deploy/packaging/docker/build-geowave-vendor.sh $SKIP_EXTRA"
