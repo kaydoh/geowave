@@ -114,7 +114,7 @@ popd
 mv %{buildroot}%{geowave_tools_home}/build.properties %{buildroot}%{geowave_tools_home}/geowave-tools-build.properties
 #replace vendor-version particular variables in geowave-tools.sh
 sed -i -e s~'$GEOWAVE_TOOLS_HOME'~%{geowave_tools_home}~g %{SOURCE12}
-sed -i -e s/'$GEOWAVE_TOOLS_JAR'/%{SOURCE11}/g %{SOURCE12}
+sed -i -e s/'$GEOWAVE_TOOLS_JAR'/geowave-tools-%{version}-%{vendor_version}.jar/g %{SOURCE12}
 cp  %{SOURCE12} %{buildroot}%{geowave_tools_home}
 mkdir -p %{buildroot}%{geowave_plugins_home}
 

@@ -46,12 +46,9 @@ cd ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave
 # Extract all the files
 rpm2cpio *.rpm | cpio -idmv
 
-# Extract the pdf version of the docs so it's more visibly available
-tar xzf site.tar.gz --strip-components=1  site/documentation.pdf
-
 # Push our compiled docs to S3 if aws command has been installed
 if command -v aws >/dev/null 2>&1 ; then
-	aws s3 cp site/documentation.pdf s3://geowave/${GEOWAVE_VERSION_URL}/docs/
+	aws s3 cp --acl public-read --recursive ${WORKSPACE}/target/site/ s3://geowave/${GEOWAVE_VERSION_URL}/
 fi
 
 # Archive things, copy some artifacts up to AWS if available and get rid of our temp area

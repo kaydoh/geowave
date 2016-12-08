@@ -35,8 +35,8 @@ cd $WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES
 if [ $BUILD_SUFFIX = "common" ]
 then
 	rm -f *.gz *.jar
-	cp /usr/src/geowave/target/site.tar.gz .
-	cp /usr/src/geowave/docs/target/manpages.tar.gz .
+	cp /usr/src/geowave/target/site-${GEOWAVE_VERSION}.tar.gz .
+	cp /usr/src/geowave/docs/target/manpages-${GEOWAVE_VERSION}.tar.gz .
 	cp /usr/src/geowave/deploy/target/*${GEOWAVE_VERSION}.tar.gz .
 else
 	rm -f *.gz *.jar

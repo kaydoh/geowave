@@ -23,9 +23,9 @@ Summary:        GeoWave provides geospatial and temporal indexing on top of Accu
 License:        Apache2
 Group:          Applications/Internet
 Source1:        bash_profile.sh
-Source2:        site.tar.gz
-Source3:        manpages.tar.gz
-Source4:        puppet-scripts.tar.gz
+Source2:        site-%{version}.tar.gz
+Source3:        manpages-%{version}.tar.gz
+Source4:        puppet-scripts-%{version}.tar.gz
 BuildRequires:  unzip
 BuildRequires:  zip
 BuildRequires:  xmlto
