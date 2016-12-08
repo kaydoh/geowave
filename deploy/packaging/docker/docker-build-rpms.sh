@@ -6,6 +6,7 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TIME_TAG=$(date +"%Y%m%d%H%M")
+SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
