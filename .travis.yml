@@ -47,9 +47,8 @@ before_install:
   - .utility/maven-coveralls-hack.sh
   # Install & run bigtable emulator
   - .utility/gcloud-init.sh
-  - ./google-cloud-sdk/bin/gcloud beta emulators bigtable start &
-  - ./google-cloud-sdk/bin/gcloud beta emulators bigtable env-init > exportBigtableEnv
-  - source exportBigtableEnv
+  - ./google-cloud-sdk/bin/gcloud beta emulators bigtable start --host-port localhost:8128 &
+  - export BIGTABLE_EMULATOR_HOST=localhost:8128
 after_success:
   - .utility/publish-docs.sh
   - cd test; mvn coveralls:report -Daccumulo.version=${ACCUMULO_VERSION} -Daccumulo.api=${ACCUMULO_API} -Dhbase.version=${HBASE_VERSION} -Dhadoop.version=${HADOOP_VERSION} -Dgeotools.version=${GEOTOOLS_VERSION} -Dgeoserver.version=${GEOSERVER_VERSION} -P ${PLATFORM_VERSION}
