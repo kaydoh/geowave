@@ -19,15 +19,12 @@ EOF
 Y
 EOF
 
+	# run the following steps after this script completes:
 	# start the emulator
-	./google-cloud-sdk/bin/gcloud beta emulators bigtable start &
-
-	# wait a few seconds
-	sleep 10
+	#./google-cloud-sdk/bin/gcloud beta emulators bigtable start &
 
 	# get the emulator port and set it in the env
-	./google-cloud-sdk/bin/gcloud beta emulators bigtable env-init > exportBigtableEnv
+	#./google-cloud-sdk/bin/gcloud beta emulators bigtable env-init > exportBigtableEnv
 
-	# this next step has to be run outside this script:
 	# source exportBigtableEnv
 fi
