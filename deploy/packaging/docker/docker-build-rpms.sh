@@ -72,7 +72,7 @@ docker run --rm \
     -v $LOCK_DIR:/usr/src/lock \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
-    "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev"
+    "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev --time-tag $TIME_TAG"
 
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
@@ -96,7 +96,7 @@ do
 		-e BUILD_TYPE="vendor" \
 		-e TIME_TAG="$TIME_TAG" \
     	-v $DOCKER_ROOT:/root \
-    	-v $WORKSPACE:/usr/src/geowave \    	
+    	-v $WORKSPACE:/usr/src/geowave \
     	-v $LOCAL_REPO_DIR:/usr/src/repo \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
@@ -113,5 +113,5 @@ do
     	-v $LOCK_DIR:/usr/src/lock \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
-    	"cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev"	
+    "cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev --time-tag $TIME_TAG"	
 done
