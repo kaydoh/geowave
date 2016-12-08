@@ -22,6 +22,7 @@ case ${ARGS[command]} in
     build-vendor) rpmbuild \
                 --define "_topdir $(pwd)" \
                 --define "_version $GEOWAVE_VERSION" \
+                --define "_time_tag ${ARGS[time-tag]}" \
                 --define "_vendor_version ${ARGS[vendor-version]}" \
                 --define "_priority $(parsePriorityFromVersion $GEOWAVE_VERSION)" \
                 $(buildArg "${ARGS[buildarg]}") SPECS/*-vendor.spec ;;
@@ -29,6 +30,7 @@ case ${ARGS[command]} in
     build-common) rpmbuild \
                 --define "_topdir $(pwd)" \
                 --define "_version $GEOWAVE_VERSION" \
+                --define "_time_tag ${ARGS[time-tag]}" \
                 --define "_priority $(parsePriorityFromVersion $GEOWAVE_VERSION)" \
                 $(buildArg "${ARGS[buildarg]}") SPECS/*-common.spec ;;
     clean) clean ;;

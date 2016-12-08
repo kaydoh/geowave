@@ -42,4 +42,4 @@ cp /usr/src/geowave/deploy/target/*.tar.gz .
 cd ..
 
 # Build
-$WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command build-${BUILD_TYPE} --vendor-version $VENDOR_VERSION --geowave-version $GEOWAVE_VERSION
+$WORKSPACE/deploy/packaging/rpm/centos/6/rpm.sh --command build-${BUILD_TYPE} --vendor-version $VENDOR_VERSION --geowave-version $GEOWAVE_VERSION --time-tag $TIME_TAG

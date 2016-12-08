@@ -4,7 +4,6 @@
 # reindexing the existing rpm repo
 #
 
-TIME_TAG=$(date +"%Y%m%d%H%M")
 # Get the version
 GEOWAVE_VERSION=$(cat $WORKSPACE/deploy/target/version.txt)
 VENDOR_VERSION=apache

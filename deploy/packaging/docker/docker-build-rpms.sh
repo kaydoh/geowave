@@ -4,6 +4,7 @@
 #
 # Source all our reusable functionality, argument is the location of this script.
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TIME_TAG=$(date +"%Y%m%d%H%M")
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
@@ -55,6 +56,7 @@ docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
 	-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
 	-e BUILD_TYPE="common" \
+	-e TIME_TAG="$TIME_TAG" \
     -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
@@ -87,6 +89,7 @@ do
     	-e BUILD_ARGS="$build_args" \
 		-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
 		-e BUILD_TYPE="vendor" \
+		-e TIME_TAG="$TIME_TAG" \
     	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
