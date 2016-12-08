@@ -10,7 +10,7 @@ echo "---------------------------------------------------------------"
 echo "         Building GeoWave Common"
 echo "---------------------------------------------------------------"
 mkdir -p $WORKSPACE/deploy/target
-GEOWAVE_VERSION_STR = $(mvn -q -o -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec)
+GEOWAVE_VERSION_STR="$(mvn -q -o -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec)"
 echo ${GEOWAVE_VERSION_STR} | sed -e 's/"//g' -e 's/-SNAPSHOT//g' > $WORKSPACE/deploy/target/version.txt
 if [ $GEOWAVE_VERSION_STR == *"-SNAPSHOT"* ]
 then
