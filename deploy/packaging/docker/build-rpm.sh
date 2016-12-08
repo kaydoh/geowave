@@ -3,6 +3,8 @@
 # This script will build a single set of rpms for a given configuration
 #
 
+# This script runs with a volume mount to $WORKSPACE, this ensures that any signal failure will leave all of the files $WORKSPACE editable by the host  
+trap 'chmod -R 777 $WORKSPACE/deploy/packaging/rpm' EXIT
 # Set a default version
 VENDOR_VERSION=apache
 

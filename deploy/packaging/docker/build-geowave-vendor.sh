@@ -1,8 +1,10 @@
 #!/bin/bash
 #
-# GeoWave Jenkins Build Script
+# GeoWave Vendor-specific Build Script
 #
 
+# This script runs with a volume mount to $WORKSPACE, this ensures that any signal failure will leave all of the files $WORKSPACE editable by the host  
+trap 'chmod -R 777 $WORKSPACE' EXIT
 
 GEOWAVE_VERSION=$(mvn -q -o -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec | sed -e 's/"//g' -e 's/-SNAPSHOT//g')
 # Set a default version

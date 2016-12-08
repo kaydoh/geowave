@@ -3,16 +3,16 @@
 # This script will build and package all of the configurations listed in the BUILD_ARGS_MATRIX array.
 #
 # Source all our reusable functionality, argument is the location of this script.
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TIME_TAG=$(date +"%Y%m%d%H%M")
 cd "$SCRIPT_DIR/../../.."
 WORKSPACE="$(pwd)"
 DOCKER_ROOT=$WORKSPACE/docker-root
-SKIP_EXTRA="-Dfindbugs.skip -Dformatter.skip -DskipTests"
 GEOSERVER_VERSION=geoserver-2.10.0-bin.zip
 GEOSERVER_ARTIFACT=$WORKSPACE/deploy/packaging/rpm/centos/6/SOURCES/geoserver.zip
 LOCAL_REPO_DIR=/var/www/html/repos/snapshots
-
+LOCK_DIR=/var/lock/subsys
 if [ -z $GEOSERVER_DOWNLOAD_BASE ]; then
 	GEOSERVER_DOWNLOAD_BASE=https://s3.amazonaws.com/geowave-deploy/third-party-downloads/geoserver
 fi
@@ -36,9 +36,6 @@ else
 # "-Daccumulo.version=1.7.0.2.4.2.0-258 -Daccumulo.api=1.7 -Dhadoop.version=2.7.1.2.4.2.0-258 -Dgeotools.version=16.0 -Dgeoserver.version=2.10.0 -Dhbase.version=1.1.2.2.4.2.0-258 -P hortonworks -Dvendor.version=hdp2"
     )
 fi
-
-export MVN_PACKAGE_VENDOR_CMD="/usr/src/geowave/deploy/packaging/docker/build-geowave-vendor.sh $SKIP_EXTRA"
-export MVN_PACKAGE_COMMON_CMD="/usr/src/geowave/deploy/packaging/docker/build-geowave-common.sh $SKIP_EXTRA"
 mkdir $DOCKER_ROOT
 
 $WORKSPACE/deploy/packaging/docker/pull-s3-caches.sh $DOCKER_ROOT
@@ -50,7 +47,7 @@ docker run --rm \
 	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
 	ngageoint/geowave-centos6-java8-build \
 	/bin/bash -c \
-	"chmod -R 777 \$WORKSPACE && cd \$WORKSPACE && $MVN_PACKAGE_COMMON_CMD && chmod -R 777 \$WORKSPACE"
+	"cd \$WORKSPACE && deploy/packaging/docker/build-geowave-common.sh $SKIP_EXTRA"
 	
 docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
@@ -60,15 +57,18 @@ docker run --rm \
     -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
-    "cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh  && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"
+    "cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh"
 
 docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
     -e LOCAL_REPO_DIR=/usr/src/repo \
-    -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave -v $LOCAL_REPO_DIR:/usr/src/repo \
+    -e LOCK_DIR=/usr/src/lock \
+    -v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    -v $LOCAL_REPO_DIR:/usr/src/repo \
+    -v $LOCK_DIR:/usr/src/lock \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
-    "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"
+    "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev"
 
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
@@ -82,7 +82,7 @@ do
 		-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
 		ngageoint/geowave-centos6-java8-build \
 		/bin/bash -c \
-		"chmod -R 777 \$WORKSPACE && cd \$WORKSPACE && $MVN_PACKAGE_VENDOR_CMD && chmod -R 777 \$WORKSPACE"
+		"cd \$WORKSPACE && deploy/packaging/docker/build-geowave-vendor.sh $SKIP_EXTRA"
 
 	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
@@ -90,17 +90,23 @@ do
 		-e GEOSERVER_VERSION="$GEOSERVER_VERSION" \
 		-e BUILD_TYPE="vendor" \
 		-e TIME_TAG="$TIME_TAG" \
-    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave \
+    	-v $DOCKER_ROOT:/root \
+    	-v $WORKSPACE:/usr/src/geowave \    	
+    	-v $LOCAL_REPO_DIR:/usr/src/repo \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
-    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh  && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"
+    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh"
     
     docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
     	-e BUILD_ARGS="$build_args" \
     	-e LOCAL_REPO_DIR=/usr/src/repo \
-    	-v $DOCKER_ROOT:/root -v $WORKSPACE:/usr/src/geowave -v $LOCAL_REPO_DIR:/usr/src/repo \
+    	-e LOCK_DIR=/usr/src/lock \
+    	-v $DOCKER_ROOT:/root \
+    	-v $WORKSPACE:/usr/src/geowave \
+    	-v $LOCAL_REPO_DIR:/usr/src/repo \
+    	-v $LOCK_DIR:/usr/src/lock \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
-    	"cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev && chmod -R 777 \$WORKSPACE/deploy/packaging/rpm"	
+    	"cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave --buildtype dev"	
 done

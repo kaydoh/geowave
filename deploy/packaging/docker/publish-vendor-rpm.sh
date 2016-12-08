@@ -4,6 +4,9 @@
 # reindexing the existing rpm repo
 #
 
+# This script runs with a volume mount to $WORKSPACE, this ensures that any signal failure will leave all of the files $WORKSPACE editable by the host  
+trap 'chmod -R 777 $WORKSPACE/deploy/packaging/rpm' EXIT
+
 # Get the version
 GEOWAVE_VERSION=$(cat $WORKSPACE/deploy/target/version.txt)
 VENDOR_VERSION=apache
@@ -74,5 +77,5 @@ fi
 # exclusive file lock before proceeding with a maximum wait time set at 10 minutes before they give
 # up and fail. the ha* commands are from the hatools rpm available via EPEL.
 hatimerun -t 10:00 \
-halockrun /var/lock/subsys/rpmrepo \
+halockrun ${LOCK_DIR}/rpmrepo \
 createrepo --update --workers 2 ${LOCAL_REPO_DIR}/${ARGS[repo]}/${ARGS[buildtype]}/${ARGS[arch]}/
