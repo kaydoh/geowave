@@ -47,7 +47,7 @@ cd ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave
 rpm2cpio *.rpm | cpio -idmv
 
 # Push our compiled docs to S3 if aws command has been installed
-if [[command -v aws >/dev/null 2>&1 &&  ! -z "$BUILD_ARGS" ]]; then
+if [[command -v aws >/dev/null 2>&1 &&  ! -z "$GEOWAVE_VERSION_URL" ]]; then
 	aws s3 rm --recursive ${WORKSPACE}/target/site/ s3://geowave/${GEOWAVE_VERSION_URL}/
 	aws s3 cp --acl public-read --recursive ${WORKSPACE}/target/site/ s3://geowave/${GEOWAVE_VERSION_URL}/
 fi
