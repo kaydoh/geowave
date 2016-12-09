@@ -53,7 +53,9 @@ public class BigtableEmulator
 	public boolean start() {
 		if (!isInstalled()) {
 			try {
-				install();
+				if (!install()) {
+					return false;
+				}
 			}
 			catch (IOException e) {
 				LOGGER.error(e.getMessage());
@@ -80,7 +82,7 @@ public class BigtableEmulator
 		return (gcloudExe.canExecute());
 	}
 
-	protected void install()
+	protected boolean install()
 			throws IOException {
 		URL url = new URL(
 				GCLOUD_URL+GCLOUD_TAR);
@@ -114,8 +116,28 @@ public class BigtableEmulator
 					"cannot delete " + downloadFile.getAbsolutePath());
 		}
 		
+		// Check the install
+		if (!isInstalled()) {
+			LOGGER.error("Gcloud install failed");
+			return false;
+		}
+		
+		// Install the beta components
+		CommandLine cmdLine = new CommandLine(sdkDir+"/"+GCLOUD_EXE);
+		cmdLine.addArgument("components");
+		cmdLine.addArgument("install");
+		cmdLine.addArgument("beta");
+		cmdLine.addArgument("--quiet");
+		DefaultExecutor executor = new DefaultExecutor();
+		int exitValue = executor.execute(cmdLine);
+		
+		LOGGER.warn(
+				"KAM >>> gcloud install beta; exit code = " + exitValue);
+
 		// the emulator needs to be started interactively to complete the install
-		//runScript(); 
+		//runScript();
+		
+		return true;
 	}
 	
 	// Currently being run from travis externally
@@ -169,7 +191,6 @@ public class BigtableEmulator
 		cmdLine.addArgument("start");
 		cmdLine.addArgument("--host-port");
 		cmdLine.addArgument(HOST_PORT);
-		cmdLine.addArgument("--quiet");
 		
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
