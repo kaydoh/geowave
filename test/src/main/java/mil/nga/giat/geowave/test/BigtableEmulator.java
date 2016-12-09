@@ -1,11 +1,9 @@
 package mil.nga.giat.geowave.test;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
@@ -24,10 +22,11 @@ public class BigtableEmulator
 {
 	private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BigtableEmulator.class);
 	
+	// these need to move to config
 	private final static String GCLOUD_URL = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/";
 	private final static String GCLOUD_TAR = "google-cloud-sdk-136.0.0-linux-x86_64.tar.gz";
 	private final static String GCLOUD_EXE = "google-cloud-sdk/bin/gcloud";
-	private static final String HOST_PORT = "localhost:8128";
+	private static final String HOST_PORT = "localhost:8128"; 
 
 	private final File sdkDir;
 	private ExecuteWatchdog watchdog;
@@ -71,7 +70,7 @@ public class BigtableEmulator
 			LOGGER.error(e.getMessage());
 			return false;
 		}
-		
+
 		return true;
 	}
 	
@@ -79,6 +78,8 @@ public class BigtableEmulator
 		if (watchdog != null) {
 			watchdog.destroyProcess();
 		}
+		
+		LOGGER.warn("Bigtable emulator stopped");
 	}
 	
 	private boolean isInstalled() {
@@ -141,10 +142,7 @@ public class BigtableEmulator
 		LOGGER.warn(
 				"KAM >>> gcloud install beta; exit code = " + exitValue);
 
-		// the emulator needs to be started interactively to complete the install
-		//runScript();
-		
-		return true;
+		return (exitValue == 0);
 	}
 
 	/**
@@ -168,8 +166,10 @@ public class BigtableEmulator
 		cmdLine.addArgument("--host-port");
 		cmdLine.addArgument(HOST_PORT);
 		
+		// Using a result handler makes the emulator run async
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
+		// watchdog shuts down the emulator, later
 		watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
 		Executor executor = new DefaultExecutor();
 		executor.setWatchdog(watchdog);

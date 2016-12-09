@@ -43,11 +43,8 @@ before_install:
   - chmod +x .utility/build-docs.sh
   - chmod +x .utility/publish-docs.sh
   - chmod +x .utility/maven-coveralls-hack.sh
-  - chmod +x .utility/gcloud-init.sh
   - .utility/maven-coveralls-hack.sh
-  # Install & run bigtable emulator
-  - .utility/gcloud-init.sh
-  - ./google-cloud-sdk/bin/gcloud beta emulators bigtable start --host-port localhost:8128 &
+  # Bigtable emulator needs this env var set
   - export BIGTABLE_EMULATOR_HOST=localhost:8128
 after_success:
   - .utility/publish-docs.sh
