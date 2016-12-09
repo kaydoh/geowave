@@ -115,7 +115,7 @@ public class BigtableEmulator
 		}
 		
 		// the emulator needs to be started interactively to complete the install
-		runScript(); 
+		//runScript(); 
 	}
 	
 	// Currently being run from travis externally
@@ -169,6 +169,7 @@ public class BigtableEmulator
 		cmdLine.addArgument("start");
 		cmdLine.addArgument("--host-port");
 		cmdLine.addArgument(HOST_PORT);
+		cmdLine.addArgument("--quiet");
 		
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
