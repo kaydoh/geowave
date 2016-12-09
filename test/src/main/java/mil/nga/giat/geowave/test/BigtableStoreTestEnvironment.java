@@ -1,12 +1,5 @@
 package mil.nga.giat.geowave.test;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.log4j.Logger;
 
 import mil.nga.giat.geowave.core.store.DataStore;
@@ -78,82 +71,8 @@ public class BigtableStoreTestEnvironment extends
 		}
 
 		// Bigtable IT's rely on an external gcloud emulator
-		initGcloud();
-	}
-
-	// Currently being run from travis externally
-	private void initGcloud() {
-		try {
-			String processDir = System.getProperty(
-					"user.dir");
-			LOGGER.warn(
-					"KAM >>> Running gcloud install in " + processDir);
-
-			// Ensure script is executable
-			String scriptFilename = processDir + "/gcloud-init.sh";
-			File scriptFile = new File(
-					scriptFilename);
-			if (!scriptFile.canExecute()) {
-				int rc = executeCommand(
-						"chmod 755 gcloud-init.sh");
-				LOGGER.warn(
-						"KAM >>> chmod exit code: " + rc);
-			}
-
-			startCommandThread("gcloud-init.sh");
-		}
-		catch (IOException e) {
-			LOGGER.error(
-					e);
-		}
-	}
-
-	/**
-	 * Using apache commons exec for cmd line execution
-	 * 
-	 * @param command
-	 * @return exitCode
-	 * @throws ExecuteException
-	 * @throws IOException
-	 */
-	private int executeCommand(
-			String command )
-			throws ExecuteException,
-			IOException {
-		CommandLine commandLine = CommandLine.parse(
-				command);
-		DefaultExecutor executor = new DefaultExecutor();
-
-		String processDir = System.getProperty(
-				"user.dir");
-		executor.setWorkingDirectory(
-				new File(
-						processDir));
-
-		return executor.execute(
-				commandLine);
-	}
-
-	private void startCommandThread(
-			final String command ) {
-		Thread cmdThread = new Thread() {
-			public void run() {
-				try {
-					executeCommand(
-							command);
-				}
-				catch (ExecuteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
-
-		cmdThread.start();
+		BigtableEmulator emulator = new BigtableEmulator(null); // null uses tmp dir
+		emulator.start();
 	}
 
 	@Override
