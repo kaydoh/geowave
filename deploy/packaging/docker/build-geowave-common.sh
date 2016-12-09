@@ -11,8 +11,9 @@ echo "         Building GeoWave Common"
 echo "---------------------------------------------------------------"
 mkdir -p $WORKSPACE/deploy/target
 GEOWAVE_VERSION_STR="$(mvn -q -o -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive -f $WORKSPACE/pom.xml exec:exec)"
-echo ${GEOWAVE_VERSION_STR} | sed -e 's/"//g' -e 's/-SNAPSHOT//g' > $WORKSPACE/deploy/target/version.txt
-if [ $GEOWAVE_VERSION_STR == *"-SNAPSHOT"* ]
+GEOWAVE_VERSION="$(echo ${GEOWAVE_VERSION_STR} | sed -e 's/"//g' -e 's/-SNAPSHOT//g')"
+echo $GEOWAVE_VERSION > $WORKSPACE/deploy/target/version.txt
+if [[ ! "$GEOWAVE_VERSION_STR" =~ "SNAPSHOT" ]]
 then
 	#its a dev/latest build
 	echo "dev" > $WORKSPACE/deploy/target/build-type.txt
@@ -23,14 +24,14 @@ else
 	echo $GEOWAVE_VERSION_STR > $WORKSPACE/deploy/target/version-url.txt
 fi
 # Build and archive HTML/PDF docs
-if [ ! -f $WORKSPACE/target/site-${GEOWAVE_VERSION}.tar.gz ]; then
-    mvn -o javadoc:aggregate $BUILD_ARGS "$@"
-    mvn -o -P docs -pl docs install $BUILD_ARGS "$@"
+if [[ ! -f $WORKSPACE/target/site-${GEOWAVE_VERSION}.tar.gz ]]; then
+    mvn -o -q javadoc:aggregate $BUILD_ARGS "$@"
+    mvn -o -q -P docs -pl docs install $BUILD_ARGS "$@"
     tar -czf $WORKSPACE/target/site-${GEOWAVE_VERSION}.tar.gz -C $WORKSPACE/target site
 fi
 
 # Build and archive the man pages
-if [ ! -f $WORKSPACE/docs/target/manpages-${GEOWAVE_VERSION}.tar.gz ]; then
+if [[ ! -f $WORKSPACE/docs/target/manpages-${GEOWAVE_VERSION}.tar.gz ]]; then
     mkdir -p $WORKSPACE/docs/target/{asciidoc,manpages}
     cp -fR $WORKSPACE/docs/content/manpages/* $WORKSPACE/docs/target/asciidoc
     find $WORKSPACE/docs/target/asciidoc/ -name "*.txt" -exec sed -i "s|//:||" {} \;
@@ -38,6 +39,6 @@ if [ ! -f $WORKSPACE/docs/target/manpages-${GEOWAVE_VERSION}.tar.gz ]; then
     tar -czf $WORKSPACE/docs/target/manpages-${GEOWAVE_VERSION}.tar.gz -C $WORKSPACE/docs/target/manpages/ .
 fi
 ## Copy over the puppet scripts
-if [ ! -f $WORKSPACE/deploy/target/puppet-scripts-${GEOWAVE_VERSION}.tar.gz ]; then
+if [[ ! -f $WORKSPACE/deploy/target/puppet-scripts-${GEOWAVE_VERSION}.tar.gz ]]; then
     tar -czf $WORKSPACE/deploy/target/puppet-scripts-${GEOWAVE_VERSION}.tar.gz -C $WORKSPACE/deploy/packaging/puppet geowave
 fi
