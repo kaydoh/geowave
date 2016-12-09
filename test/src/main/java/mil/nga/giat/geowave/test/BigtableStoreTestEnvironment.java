@@ -88,43 +88,66 @@ public class BigtableStoreTestEnvironment extends
 					"user.dir");
 			LOGGER.warn(
 					"KAM >>> Running gcloud install in " + processDir);
-			
+
 			// Ensure script is executable
 			String scriptFilename = processDir + "/gcloud-init.sh";
-			File scriptFile = new File(scriptFilename);
+			File scriptFile = new File(
+					scriptFilename);
 			if (!scriptFile.canExecute()) {
-				int rc = executeCommand("chmod 755 " + scriptFilename);
+				int rc = executeCommand(
+						"chmod 755 " + scriptFilename);
 				LOGGER.warn(
-						"KAM >>> chmod exit code: " + rc );
+						"KAM >>> chmod exit code: " + rc);
 			}
-	
-			int	rc = executeCommand(scriptFilename);
-			
-			LOGGER.warn(
-					"KAM >>> gcloud exit code: " + rc );
+
+			executeCommand(
+					scriptFilename);
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 	}
 
 	/**
 	 * Using apache commons exec for cmd line execution
+	 * 
 	 * @param command
 	 * @return exitCode
 	 * @throws ExecuteException
 	 * @throws IOException
 	 */
 	private int executeCommand(
-			String command ) throws ExecuteException, IOException {
-		CommandLine commandLine = CommandLine.parse(command);
+			String command )
+			throws ExecuteException,
+			IOException {
+		CommandLine commandLine = CommandLine.parse(
+				command);
 		DefaultExecutor executor = new DefaultExecutor();
-		
-		ExecuteWatchdog watchdog = new ExecuteWatchdog(30000);
-		executor.setWatchdog(watchdog);
-		
-		return executor.execute(commandLine);
+
+		return executor.execute(
+				commandLine);
+	}
+
+	private void startCommandThread(
+			final String command ) {
+		Thread cmdThread = new Thread() {
+			public void run() {
+				try {
+					executeCommand(
+							command);
+				}
+				catch (ExecuteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
+
+		cmdThread.start();
 	}
 
 	@Override
