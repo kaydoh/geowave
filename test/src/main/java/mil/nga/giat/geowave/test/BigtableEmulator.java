@@ -30,6 +30,7 @@ public class BigtableEmulator
 	private static final String HOST_PORT = "localhost:8128";
 
 	private final File sdkDir;
+	private ExecuteWatchdog watchdog;
 
 	public BigtableEmulator(
 			String sdkDir ) {
@@ -72,6 +73,12 @@ public class BigtableEmulator
 		}
 		
 		return true;
+	}
+	
+	public void stop() {
+		if (watchdog != null) {
+			watchdog.destroyProcess();
+		}
 	}
 	
 	private boolean isInstalled() {
@@ -139,38 +146,6 @@ public class BigtableEmulator
 		
 		return true;
 	}
-	
-	// Currently being run from travis externally
-	private void runScript() {
-		try {
-			String testDir = System.getProperty(
-					"user.dir");
-			LOGGER.warn(
-					"KAM >>> Running gcloud setup in " + testDir);
-
-			// Ensure script is executable
-			String scriptFilename = testDir + "/gcloud-init.sh";
-			File scriptFile = new File(
-					scriptFilename);
-			if (!scriptFile.canExecute()) {
-				scriptFile.setExecutable(true);
-			}
-			
-			// Run the script using commons exec
-			CommandLine cmdLine = new CommandLine(scriptFilename);
-			cmdLine.addArgument(sdkDir.getAbsolutePath());
-			
-			DefaultExecutor executor = new DefaultExecutor();
-			int exitValue = executor.execute(cmdLine);
-			
-			LOGGER.warn(
-					"KAM >>> gcloud setup exit code = " + exitValue);
-		}
-		catch (IOException e) {
-			LOGGER.error(
-					e.getMessage());
-		}
-	}
 
 	/**
 	 * Using apache commons exec for cmd line execution
@@ -189,19 +164,15 @@ public class BigtableEmulator
 		cmdLine.addArgument("emulators");
 		cmdLine.addArgument("bigtable");
 		cmdLine.addArgument("start");
+		cmdLine.addArgument("--quiet");
 		cmdLine.addArgument("--host-port");
 		cmdLine.addArgument(HOST_PORT);
 		
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
-		ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
+		watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
 		Executor executor = new DefaultExecutor();
 		executor.setWatchdog(watchdog);
 		executor.execute(cmdLine, resultHandler);
-
-		// some time later the result handler callback was invoked so we
-		// can safely request the exit value
-		
-		resultHandler.waitFor();
 	}
 }

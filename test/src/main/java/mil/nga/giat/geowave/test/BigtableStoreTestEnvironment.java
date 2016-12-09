@@ -27,6 +27,7 @@ public class BigtableStoreTestEnvironment extends
 			BigtableStoreTestEnvironment.class);
 
 	protected String zookeeper;
+	protected BigtableEmulator emulator;
 
 	private BigtableStoreTestEnvironment() {}
 
@@ -71,12 +72,17 @@ public class BigtableStoreTestEnvironment extends
 		}
 
 		// Bigtable IT's rely on an external gcloud emulator
-		BigtableEmulator emulator = new BigtableEmulator(null); // null uses tmp dir
-		emulator.start();
+		emulator = new BigtableEmulator(null); // null uses tmp dir
+		
+		if (!emulator.start()) {
+			LOGGER.error("Bigtable emulator startup failed");
+		}
 	}
 
 	@Override
-	public void tearDown() {}
+	public void tearDown() {
+		emulator.stop();
+	}
 
 	@Override
 	public TestEnvironment[] getDependentEnvironments() {
