@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.log4j.Logger;
 
 import mil.nga.giat.geowave.core.store.DataStore;
@@ -85,48 +89,37 @@ public class BigtableStoreTestEnvironment extends
 		LOGGER.warn(
 				"KAM >>> Running gcloud install in " + processDir);
 
-		String chmodIt = "/bin/bash -c chmod 755 " + processDir + "/gcloud-init.sh";
-		String chmodOut = executeCommand(
-				chmodIt);
-		LOGGER.warn(
-				chmodOut);
-
-		String cmdOut = executeCommand(
-				processDir + "/gcloud-init.sh");
-		LOGGER.warn(
-				cmdOut);
-	}
-
-	private String executeCommand(
-			String command ) {
-		StringBuffer output = new StringBuffer();
-
-		Process p;
+		int rc = -1;
+		
 		try {
-			p = Runtime.getRuntime().exec(
-					command);
-			p.waitFor();
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(
-							p.getInputStream()));
-
-			String line = "";
-			while ((line = reader.readLine()) != null) {
-				output.append(
-						line + "\n");
-			}
-
+			rc = executeCommand(
+					processDir + "/gcloud-init.sh");
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		LOGGER.warn(
+				"KAM >>> exit code: " + rc );
+	}
 
-		return output.toString();
+	/**
+	 * Using apache commons exec for cmd line execution
+	 * @param command
+	 * @return exitCode
+	 * @throws ExecuteException
+	 * @throws IOException
+	 */
+	private int executeCommand(
+			String command ) throws ExecuteException, IOException {
+		CommandLine commandLine = CommandLine.parse(command);
+		DefaultExecutor executor = new DefaultExecutor();
+		
+		ExecuteWatchdog watchdog = new ExecuteWatchdog(30000);
+		executor.setWatchdog(watchdog);
+		
+		return executor.execute(commandLine);
 	}
 
 	@Override
