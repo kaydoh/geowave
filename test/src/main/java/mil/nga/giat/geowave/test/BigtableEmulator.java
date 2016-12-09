@@ -83,7 +83,7 @@ public class BigtableEmulator
 	protected void install()
 			throws IOException {
 		URL url = new URL(
-				GCLOUD_URL);
+				GCLOUD_URL+GCLOUD_TAR);
 
 		final File downloadFile = new File(
 				sdkDir,
