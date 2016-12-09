@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.log4j.Logger;
 
 import mil.nga.giat.geowave.core.store.DataStore;
@@ -100,11 +99,15 @@ public class BigtableStoreTestEnvironment extends
 						"KAM >>> chmod exit code: " + rc);
 			}
 
-			executeCommand(
-					scriptFilename);
+			int rc = executeCommand(
+					scriptFilename + " &");
+
+			LOGGER.warn(
+					"KAM >>> gcloud script exit code: " + rc);
 		}
 		catch (IOException e) {
-			LOGGER.error(e);
+			LOGGER.error(
+					e);
 		}
 	}
 
@@ -126,28 +129,6 @@ public class BigtableStoreTestEnvironment extends
 
 		return executor.execute(
 				commandLine);
-	}
-
-	private void startCommandThread(
-			final String command ) {
-		Thread cmdThread = new Thread() {
-			public void run() {
-				try {
-					executeCommand(
-							command);
-				}
-				catch (ExecuteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
-
-		cmdThread.start();
 	}
 
 	@Override

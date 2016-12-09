@@ -26,4 +26,4 @@ fi
 export BIGTABLE_EMULATOR_HOST=localhost:8128
 
 # start the emulator
-./google-cloud-sdk/bin/gcloud beta emulators bigtable start --host-port localhost:8128 &
+./google-cloud-sdk/bin/gcloud beta emulators bigtable start --host-port localhost:8128
