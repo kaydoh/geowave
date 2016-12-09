@@ -1,8 +1,7 @@
 package mil.nga.giat.geowave.test;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -84,24 +83,30 @@ public class BigtableStoreTestEnvironment extends
 
 	// Currently being run from travis externally
 	private void initGcloud() {
-		String processDir = System.getProperty(
-				"user.dir");
-		LOGGER.warn(
-				"KAM >>> Running gcloud install in " + processDir);
-
-		int rc = -1;
-		
 		try {
-			rc = executeCommand(
-					processDir + "/gcloud-init.sh");
+			String processDir = System.getProperty(
+					"user.dir");
+			LOGGER.warn(
+					"KAM >>> Running gcloud install in " + processDir);
+			
+			// Ensure script is executable
+			String scriptFilename = processDir + "/gcloud-init.sh";
+			File scriptFile = new File(scriptFilename);
+			if (!scriptFile.canExecute()) {
+				int rc = executeCommand("chmod 755 " + scriptFilename);
+				LOGGER.warn(
+						"KAM >>> chmod exit code: " + rc );
+			}
+	
+			int	rc = executeCommand(scriptFilename);
+			
+			LOGGER.warn(
+					"KAM >>> gcloud exit code: " + rc );
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		LOGGER.warn(
-				"KAM >>> exit code: " + rc );
 	}
 
 	/**
