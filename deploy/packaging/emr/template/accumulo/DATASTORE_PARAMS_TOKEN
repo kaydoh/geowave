@@ -1,0 +1,1 @@
+-t accumulo --zookeeper $HOSTNAME:2181 --instance $INSTANCE --user geowave --password geowave

@@ -174,7 +174,7 @@ GeoWave provides geospatial and temporal indexing on top of HBase.
 This package installs the HBase components of GeoWave
 
 %post -n %{versioned_app_name}-hbase
-/bin/bash %{geowave_hbase_home}/deploy-geowave-hbase-to-hdfs.sh >> %{geowave_accumulo_home}/geowave-hbase-to-hdfs.log 2>&1
+/bin/bash %{geowave_hbase_home}/deploy-geowave-hbase-to-hdfs.sh >> %{geowave_hbase_home}/geowave-hbase-to-hdfs.log 2>&1
 
 %files -n %{versioned_app_name}-hbase
 %defattr(644, geowave, geowave, 755)

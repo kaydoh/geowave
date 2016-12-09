@@ -5,56 +5,24 @@
 # functions at some point in the future. I've grouped each unit of work into a function 
 # with a descriptive name to help with understanding and maintainability
 #
-
 # You can change these but there is probably no need
+# Accumulo
+USER=accumulo
+# NOTE: This password, the Accumulo instance secret and the geoserver password are left at
+# The default settings. The default EMR Security group setting only allows ssh/22 open to
+# external access so access to internal consoles and web UIs has to be done over SSH.
+# At some point in the future when this is revisited remember that nodes can be added to an
+# EMR at any point after creation so the password set during the initial spin-up would have
+# to be persisted somewhere and provided to the newly created nodes at some later date.
+USERPW=secret # TODO: Can't change until trace.password in accumulo-site.xml is updated
+ACCUMULO_VERSION=1.7.2
+ACCUMULO_TSERVER_OPTS=3GB
+INSTALL_DIR=/opt
+ACCUMULO_DOWNLOAD_BASE_URL=https://archive.apache.org/dist/accumulo
 ACCUMULO_INSTANCE=accumulo
 ACCUMULO_HOME="${INSTALL_DIR}/accumulo"
-ZK_IPADDR=
-INTIAL_POLLING_INTERVAL=15 # This gets doubled for each attempt up to max_attempts
 HDFS_USER=hdfs
-
-# Parses a configuration file put in place by EMR to determine the role of this node
-is_master() {
-  if [ $(jq '.isMaster' /mnt/var/lib/info/instance.json) = 'true' ]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Avoid race conditions and actually poll for availability of component dependencies
-# Credit: http://stackoverflow.com/questions/8350942/how-to-re-run-the-curl-command-automatically-when-the-error-occurs/8351489#8351489
-with_backoff() {
-  local max_attempts=${ATTEMPTS-5}
-  local timeout=${INTIAL_POLLING_INTERVAL-1}
-  local attempt=0
-  local exitCode=0
-
-  while (( $attempt < $max_attempts ))
-  do
-    set +e
-    "$@"
-    exitCode=$?
-    set -e
-
-    if [[ $exitCode == 0 ]]
-    then
-      break
-    fi
-
-    echo "Retrying $@ in $timeout.." 1>&2
-    sleep $timeout
-    attempt=$(( attempt + 1 ))
-    timeout=$(( timeout * 2 ))
-  done
-
-  if [[ $exitCode != 0 ]]
-  then
-    echo "Fail: $@ failed to complete after $max_attempts attempts" 1>&2
-  fi
-
-  return $exitCode
-}
+ZK_IPADDR=
 
 # Using zookeeper packaged by Apache BigTop for ease of installation
 configure_zookeeper() {
@@ -69,38 +37,6 @@ configure_zookeeper() {
 	fi
 }
 
-is_hdfs_available() {
-	hadoop fs -ls /
-	return $?
-}
-
-wait_until_hdfs_is_available() {
-	with_backoff is_hdfs_available
-	if [ $? != 0 ]; then
-		echo "HDFS not available before timeout. Exiting ..."
-		exit 1
-	fi
-}
-
-# Settings recommended for Accumulo
-os_tweaks() {
-	echo -e "net.ipv6.conf.all.disable_ipv6 = 1" | sudo tee --append /etc/sysctl.conf
-	echo -e "net.ipv6.conf.default.disable_ipv6 = 1" | sudo tee --append /etc/sysctl.conf
-	echo -e "net.ipv6.conf.lo.disable_ipv6 = 1" | sudo tee --append /etc/sysctl.conf
-	echo -e "vm.swappiness = 0" | sudo tee --append /etc/sysctl.conf
-	sudo sysctl -w vm.swappiness=0
-	echo -e "" | sudo tee --append /etc/security/limits.conf
-	echo -e "*\t\tsoft\tnofile\t65536" | sudo tee --append /etc/security/limits.conf
-	echo -e "*\t\thard\tnofile\t65536" | sudo tee --append /etc/security/limits.conf
-}
-
-initialize_volumes() {
-    local VOLS=$(lsblk | awk '{ print $1 }' | grep -v NAME)
-
-    for v in $VOLS; do
-        sudo fio --filename=/dev/${v} --rw=randread --bs=128k --iodepth=32 --ioengine=libaio --direct=1 --name=volume-init >> /tmp/emr-vol-init.log
-    done
-}
 
 create_accumulo_user() {
  	id $USER
@@ -165,6 +101,18 @@ configure_accumulo() {
 	sudo -u $USER $INSTALL_DIR/accumulo/bin/start-here.sh
 }
 
+configure_geowave_accumulo(){
+# Configure accumulo user and namespace
+cat <<EOF | accumulo shell -u root -p secret -e "createuser geowave"
+geowave
+geowave
+EOF
+accumulo shell -u root -p secret -e "createnamespace geowave"
+accumulo shell -u root -p secret -e "grant NameSpace.CREATE_TABLE -ns geowave -u geowave"
+accumulo shell -u root -p secret -e "config -s general.vfs.context.classpath.geowave=hdfs://${HOSTNAME}:8020/accumulo/classpath/geowave/${GEOWAVE_VERSION}-apache/[^.].*.jar"
+accumulo shell -u root -p secret -e "config -ns geowave -s table.classpath.context=geowave"	
+}
+
 is_accumulo_initialized() {
 	hadoop fs -ls /accumulo/instance_id
 	return $?
@@ -175,52 +123,14 @@ is_accumulo_available() {
 	return $?
 }
 
-install_image_libs() {
-	pushd /etc/alternatives/java_sdk
-	sudo curl -O $JAI_URL
-	sudo curl -O $IMAGEIO_URL
-	sudo chmod +x *.bin
-	# Magic spells to unzip and install with auto-confirm of terms and bypassing unzip error with export
-	sudo ./jai-*.bin >/dev/null < <(echo y) >/dev/null < <(echo y)
-	sudo bash -c "export _POSIX2_VERSION=199209; ./jai_*.bin >/dev/null < <(echo y) >/dev/null < <(echo y)"
-	popd
-}
-
-install_geowave() {
-	# Install the repo config file
-	sudo rpm -Uvh http://s3.amazonaws.com/geowave-rpms/dev/noarch/$GEOWAVE_REPO_RPM
-
-	# EMR has a tar bundle installed puppet in /home/ec2-user 
-	# So as not to install incompatible puppet from the dependencies of geowave-puppet
-	# I'm doing this convoluted workaround to download and then install with no dep resolution
-	sudo yumdownloader --enablerepo geowave-dev --destdir /tmp geowave-puppet
-	sudo rpm -Uvh --force --nodeps /tmp/geowave-puppet.*.noarch.rpm 
-
-cat << EOF > /tmp/geowave.pp
-class { 'geowave::repo': 
-  repo_base_url => 'http://s3.amazonaws.com/geowave-rpms/dev/noarch/',
-  repo_enabled  => 1,
-} ->
-class { 'geowave':
-  geowave_version       => '${GEOWAVE_VERSION}',
-  hadoop_vendor_version => 'apache',
-  install_accumulo      => true,
-  install_app           => true,
-  install_app_server    => true,
-  http_port             => '${GEOSERVER_PORT}',
-}
-
-file { '/etc/geowave/geowave.config':
-	ensure  => file,
-	owner   => 'geowave',
-	group   => 'geowave',
-	mode    => 644,
-	content => 'export JAVA_OPTS="${GEOSERVER_MEMORY}"',
-	require => Package['geowave-core'],
-	notify  => Service['geowave'],
-}
-EOF
-
-	sudo sh -c "puppet apply /tmp/geowave.pp"
-	return 0
+# Settings recommended for Accumulo
+os_tweaks() {
+	echo -e "net.ipv6.conf.all.disable_ipv6 = 1" | sudo tee --append /etc/sysctl.conf
+	echo -e "net.ipv6.conf.default.disable_ipv6 = 1" | sudo tee --append /etc/sysctl.conf
+	echo -e "net.ipv6.conf.lo.disable_ipv6 = 1" | sudo tee --append /etc/sysctl.conf
+	echo -e "vm.swappiness = 0" | sudo tee --append /etc/sysctl.conf
+	sudo sysctl -w vm.swappiness=0
+	echo -e "" | sudo tee --append /etc/security/limits.conf
+	echo -e "*\t\tsoft\tnofile\t65536" | sudo tee --append /etc/security/limits.conf
+	echo -e "*\t\thard\tnofile\t65536" | sudo tee --append /etc/security/limits.conf
 }

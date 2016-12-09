@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Upload geowave-hbase.jar into HDFS
+# Upload datastore jar into HDFS
 # Attempt to use a variety of common HDFS root usernames an optional user arg will override
 #
-# deploy-geowave-hbase-to-hdfs.sh [--user HDFS_ROOT_USERNAME]
+# deploy-geowave-to-hdfs.sh [--user HDFS_ROOT_USERNAME]
 #
 
 # Test for installed apps required to run this script
@@ -21,7 +21,7 @@ dependency_tests
 
 # Start detecting the other required settings
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-HBASE_USER=hbase
+DATASTORE_USER=$DATASTORE_USER_TOKEN
 
 # Parse any arguments passed to the script
 declare -A ARGS
@@ -59,14 +59,14 @@ determine_hdfs_user() {
 HDFS_USER=$(determine_hdfs_user)
 
 parseVersion() {
-    echo $(cat "$SCRIPT_DIR/geowave-hbase-build.properties" | grep "project.version=" | sed -e 's/"//g' -e 's/-SNAPSHOT//g' -e 's/project.version=//g')
+echo $(cat "$SCRIPT_DIR/geowave-$DATASTORE_TOKEN-build.properties" | grep "project.version=" | sed -e 's/"//g' -e 's/-SNAPSHOT//g' -e 's/project.version=//g')
 }
 
-# Test to see if HBase has been initialized by looking at hdfs contents
-determine_hbase_hdfs_root() {
-    HBASE_ROOT_DIRS=('/user/hbase' '/hbase' '/apps/hbase')
+# Test to see if datastore has been initialized by looking at hdfs contents
+determine_$DATASTORE_TOKEN_hdfs_root() {
+    DATASTORE_ROOT_DIRS=('/user/$DATASTORE_TOKEN' '/$DATASTORE_TOKEN' '/apps/$DATASTORE_TOKEN')
     ROOT_DIR=
-    for dir in "${HBASE_ROOT_DIRS[@]}"
+    for dir in "${DATASTORE_ROOT_DIRS[@]}"
     do
         su $HDFS_USER -c "hadoop fs -ls $dir" > /dev/null
         if [ $? -eq 0 ] ; then
@@ -78,12 +78,10 @@ determine_hbase_hdfs_root() {
     if [ ! -z $ROOT_DIR ]; then
         echo $ROOT_DIR
     else
-        echo >&2 "Hbase application directory not found in HDFS, tried '${HBASE_ROOT_DIRS[@]}'. Aborting."
+        echo >&2 "$DATASTORE_TOKEN application directory not found in HDFS, tried '${DATASTORE_ROOT_DIRS[@]}'. Aborting."
         exit 1
     fi
 }
-
-HBASE_HDFS_ROOT=$(determine_hbase_hdfs_root)
 
 # To support concurrent version and vendor installs we're naming the directory that contains the iterator with
 # both the vendor and application version so we can support things like 0.8.7-cdh5, 0.8.7-cdh6, 0.8.8-hdp2 etc.
@@ -100,50 +98,50 @@ determine_vendor_version() {
     done
 }
 BUILD_ARGS_KEY="project.build.args="
-BUILD_ARGS_VAL=$(cat $SCRIPT_DIR/geowave-hbase-build.properties | grep "$BUILD_ARGS_KEY" | sed -e "s/$BUILD_ARGS_KEY//")
+BUILD_ARGS_VAL=$(cat $SCRIPT_DIR/geowave-$DATASTORE_TOKEN-build.properties | grep "$BUILD_ARGS_KEY" | sed -e "s/$BUILD_ARGS_KEY//")
 VENDOR_VERSION=$(determine_vendor_version $BUILD_ARGS_VAL)
 if [ ! -z $VENDOR_VERSION ]; then
     VENDOR_VERSION="$(parseVersion)-$VENDOR_VERSION"
 else
     VENDOR_VERSION="$(parseVersion)"
 fi
-HBASE_LIB_DIR="$(determine_hbase_hdfs_root)/lib"
-GEOWAVE_HBASE_HOME=/usr/local/geowave-$VENDOR_VERSION/hbase
+DATASTORE_LIB_DIR="$(determine_$DATASTORE_TOKEN_hdfs_root)/lib"
+GEOWAVE_DATASTORE_HOME=/usr/local/geowave-$VENDOR_VERSION/$DATASTORE_TOKEN
 
 # Check to see if lib directory is already present
-su $HDFS_USER -c "hadoop fs -ls $HBASE_LIB_DIR"
+su $DATASTORE_USER -c "hadoop fs -ls $DATASTORE_LIB_DIR"
 if [ $? -ne 0 ]; then # Try creating
-    su $HDFS_USER -c "hadoop fs -mkdir -p $HBASE_LIB_DIR"
+    su $HDFS_USER -c "hadoop fs -mkdir -p $DATASTORE_LIB_DIR"
     if [ $? -ne 0 ]; then
-        echo >&2 "Unable to create $HBASE_LIB_DIR directory in hdfs. Aborting."; exit 1;
+        echo >&2 "Unable to create $DATASTORE_LIB_DIR directory in hdfs. Aborting."; exit 1;
     fi
 fi
 
 # Check to see if the library is already present and remove if so (put will not replace)
-su $HDFS_USER -c "hadoop fs -ls $HBASE_LIB_DIR/geowave-hbase-$VENDOR_VERSION.jar"
+su $HDFS_USER -c "hadoop fs -ls $DATASTORE_LIB_DIR/geowave-$DATASTORE_TOKEN-$VENDOR_VERSION.jar"
 if [ $? -eq 0 ]; then
-    su $HDFS_USER -c "hadoop fs -rm $HBASE_LIB_DIR/geowave-hbase-$VENDOR_VERSION.jar"
+    su $HDFS_USER -c "hadoop fs -rm $DATASTORE_LIB_DIR/geowave-$DATASTORE_TOKEN-$VENDOR_VERSION.jar"
 fi
 
 # Upload library to hdfs
-su $HDFS_USER -c "hadoop fs -put $GEOWAVE_HBASE_HOME/geowave-hbase-$VENDOR_VERSION.jar $HBASE_LIB_DIR/geowave-hbase-$VENDOR_VERSION.jar"
+su $HDFS_USER -c "hadoop fs -put $GEOWAVE_DATASTORE_HOME/geowave-$DATASTORE_TOKEN-$VENDOR_VERSION.jar $DATASTORE_LIB_DIR/geowave-$DATASTORE_TOKEN-$VENDOR_VERSION.jar"
 if [ $? -ne 0 ]; then
-    echo >&2 "Unable to upload geowave-hbase.jar into hdfs. Aborting."; exit 1;
+echo >&2 "Unable to upload geowave-$DATASTORE_TOKEN-$VENDOR_VERSION.jar into hdfs. Aborting."; exit 1;
 fi
 
 # Also upload the build metadata file for ease of inspection
-su $HDFS_USER -c "hadoop fs -ls $HBASE_LIB_DIR/geowave-hbase-build.properties"
+su $HDFS_USER -c "hadoop fs -ls $DATASTORE_LIB_DIR/geowave-$DATASTORE_TOKEN-build.properties"
 if [ $? -eq 0 ]; then
-    su $HDFS_USER -c "hadoop fs -rm $HBASE_LIB_DIR/geowave-hbase-build.properties"
+    su $HDFS_USER -c "hadoop fs -rm $DATASTORE_LIB_DIR/geowave-$DATASTORE_TOKEN-build.properties"
 fi
 
-su $HDFS_USER -c "hadoop fs -put $GEOWAVE_HBASE_HOME/geowave-hbase-build.properties $HBASE_LIB_DIR/geowave-hbase-build.properties"
+su $HDFS_USER -c "hadoop fs -put $GEOWAVE_DATASTORE_HOME/geowave-$DATASTORE_TOKEN-build.properties $DATASTORE_LIB_DIR/geowave-$DATASTORE_TOKEN-build.properties"
 if [ $? -ne 0 ]; then
-    echo >&2 "Unable to upload geowave-hbase-build.properties into hdfs. Aborting."; exit 1;
+    echo >&2 "Unable to upload geowave-$DATASTORE_TOKEN-build.properties into hdfs. Aborting."; exit 1;
 fi
 
-# Set ownership to HBase user
-su $HDFS_USER -c "hadoop fs -chown -R $HBASE_USER:$HBASE_USER $HBASE_LIB_DIR"
+# Set ownership to datastore user
+su $HDFS_USER -c "hadoop fs -chown -R $DATASTORE_USER:$DATASTORE_USER $DATASTORE_LIB_DIR"
 if [ $? -ne 0 ]; then
-    echo >&2 "Unable to change ownership of the $HBASE_LIB_DIR directory in hdfs. Aborting."; exit 1;
+    echo >&2 "Unable to change ownership of the $DATASTORE_LIB_DIR directory in hdfs. Aborting."; exit 1;
 fi

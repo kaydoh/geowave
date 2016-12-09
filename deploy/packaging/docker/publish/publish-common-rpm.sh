@@ -10,21 +10,19 @@ trap 'chmod -R 777 $WORKSPACE/deploy/packaging/rpm' EXIT
 # Get the version
 GEOWAVE_VERSION=$(cat $WORKSPACE/deploy/target/version.txt)
 BUILD_TYPE=$(cat $WORKSPACE/deploy/target/build-type.txt)
-VENDOR_VERSION=apache
-
-if [ ! -z "$BUILD_ARGS" ]; then
-	VENDOR_VERSION=$(echo "$BUILD_ARGS" | grep -oi "vendor.version=\w*" | sed "s/vendor.version=//g")
-fi
+GEOWAVE_VERSION_URL=$(cat $WORKSPACE/deploy/target/version-url.txt)
 echo "---------------------------------------------------------------"
-echo "         Publishing GeoWave Vendor-specific RPMs"
+echo "         Publishing GeoWave Common RPMs"
 echo "GEOWAVE_VERSION=${GEOWAVE_VERSION}"
-echo "TIME_TAG=${TIME_TAG}"
-echo "VENDOR_VERSION=${VENDOR_VERSION}"
+echo "GEOWAVE_VERSION_URL=${GEOWAVE_VERSION_URL}"
 echo "BUILD_TYPE=${BUILD_TYPE}"
-echo "BUILD_ARGS=${BUILD_ARGS}"
+echo "TIME_TAG=${TIME_TAG}"
 echo "---------------------------------------------------------------"
+
+
+echo "###### Build Variables"
+
 set -x
-echo '###### Build Variables'
 declare -A ARGS
 while [ $# -gt 0 ]; do
     # Trim the first two chars off of the arg name ex: --foo
@@ -34,7 +32,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-if [ ${BUILD_TYPE} = "dev" ]
+if [[ ${BUILD_TYPE} = "dev" ]]
 then
 	TIME_TAG_STR="-${TIME_TAG}"
 fi
@@ -48,29 +46,26 @@ cd ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave
 # Extract all the files
 rpm2cpio *.rpm | cpio -idmv
 
-# Remove what we don't want to distribute within the tarball
-rm -f *.rpm *.xml *.spec
-
-# Extract the build metadata from one of the artifacts
-unzip -p geowave-accumulo-${GEOWAVE_VERSION}-${VENDOR_VERSION}.jar build.properties > build.properties
+# Push our compiled docs to S3 if aws command has been installed
+if [[command -v aws >/dev/null 2>&1 &&  ! -z "$GEOWAVE_VERSION_URL" ]]; then
+	aws s3 rm --recursive ${WORKSPACE}/target/site/ s3://geowave/${GEOWAVE_VERSION_URL}/docs/
+	aws s3 cp --acl public-read --recursive ${WORKSPACE}/target/site/ s3://geowave/${GEOWAVE_VERSION_URL}/docs/
+	
+	
+fi
 
 # Archive things, copy some artifacts up to AWS if available and get rid of our temp area
 cd ..
-tar cvzf geowave-${GEOWAVE_VERSION}-${VENDOR_VERSION}${TIME_TAG_STR}.tar.gz geowave
+
+tar cvzf geowave-${GEOWAVE_VERSION}${TIME_TAG_STR}.tar.gz geowave
 
 rm -rf geowave
-
-# Copy the Jace C++ artifacts
-cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-c++-${GEOWAVE_VERSION}-${VENDOR_VERSION}.tar.gz ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave-c++-${VENDOR_VERSION}-${GEOWAVE_VERSION}${TIME_TAG_STR}.tar.gz
 
 echo '###### Copy rpm to repo and reindex'
 
 cp -R ${WORKSPACE}/${ARGS[buildroot]}/RPMS/${ARGS[arch]}/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}/${ARGS[arch]}/
 cp -fR ${WORKSPACE}/${ARGS[buildroot]}/SRPMS/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}/SRPMS/
 cp -fR ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/*.tar.gz ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}/TARBALL/
-pushd ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/
-for i in *.jar; do cp "${i}" ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}-jars/JAR/"${i%.jar}${TIME_TAG_STR}.jar" ; done
-popd
 
 # When several processes run createrepo concurrently they will often fail with problems trying to
 # access index files that are in the process of being overwritten by the other processes. The command

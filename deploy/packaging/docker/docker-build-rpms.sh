@@ -49,7 +49,7 @@ docker run --rm \
 	-v $WORKSPACE:/usr/src/geowave \
 	ngageoint/geowave-centos6-java8-build \
 	/bin/bash -c \
-	"cd \$WORKSPACE && deploy/packaging/docker/build-geowave-common.sh $SKIP_EXTRA"
+	"cd \$WORKSPACE && deploy/packaging/docker/build-src/build-geowave-common.sh $SKIP_EXTRA"
 	
 docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
@@ -60,7 +60,7 @@ docker run --rm \
     -v $WORKSPACE:/usr/src/geowave \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
-    "cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh"
+    "cd \$WORKSPACE && deploy/packaging/docker/build-rpm/build-rpm.sh"
 
 docker run --rm \
     -e WORKSPACE=/usr/src/geowave \
@@ -73,7 +73,7 @@ docker run --rm \
     -v $LOCK_DIR:/usr/src/lock \
     ngageoint/geowave-centos6-rpm-build \
     /bin/bash -c \
-    "cd \$WORKSPACE && deploy/packaging/docker/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave"
+    "cd \$WORKSPACE && deploy/packaging/docker/publish/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave"
 
 for build_args in "${BUILD_ARGS_MATRIX[@]}"
 do
@@ -88,7 +88,7 @@ do
 		-v $WORKSPACE:/usr/src/geowave \
 		ngageoint/geowave-centos6-java8-build \
 		/bin/bash -c \
-		"cd \$WORKSPACE && deploy/packaging/docker/build-geowave-vendor.sh $SKIP_EXTRA"
+		"cd \$WORKSPACE && deploy/packaging/docker/build-src/build-geowave-vendor.sh $SKIP_EXTRA"
 
 	docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
@@ -101,7 +101,7 @@ do
     	-v $LOCAL_REPO_DIR:/usr/src/repo \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
-    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm.sh"
+    	"cd \$WORKSPACE && deploy/packaging/docker/build-rpm/build-rpm.sh"
     
     docker run --rm \
     	-e WORKSPACE=/usr/src/geowave \
@@ -115,5 +115,5 @@ do
     	-v $LOCK_DIR:/usr/src/lock \
     	ngageoint/geowave-centos6-rpm-build \
     	/bin/bash -c \
-    	"cd \$WORKSPACE && deploy/packaging/docker/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave"	
+    	"cd \$WORKSPACE && deploy/packaging/docker/publish/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave"	
 done

@@ -369,6 +369,17 @@
 		</profile>
 		<profile>
 			<id>accumulo-container-singlejar</id>
+			<properties>
+				<accumulo.scope>provided</accumulo.scope>
+				<container.extension>-accumulo-container</container.extension>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>mil.nga.giat</groupId>
+					<artifactId>geowave-datastore-accumulo</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
 			<build>
 				<plugins>
 					<plugin>
@@ -441,6 +452,17 @@
 		</profile>
 		<profile>
 			<id>hbase-container-singlejar</id>
+			<properties>
+				<hbase.scope>provided</hbase.scope>
+				<container.extension>-hbase-container</container.extension>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>mil.nga.giat</groupId>
+					<artifactId>geowave-datastore-hbase</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
 			<build>
 				<plugins>
 					<plugin>
