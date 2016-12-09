@@ -20,13 +20,16 @@ import com.jcraft.jsch.Logger;
 
 public class BigtableEmulator
 {
-	private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BigtableEmulator.class);
-	
+	private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(
+			BigtableEmulator.class);
+
 	// these need to move to config
 	private final static String GCLOUD_URL = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/";
 	private final static String GCLOUD_TAR = "google-cloud-sdk-136.0.0-linux-x86_64.tar.gz";
 	private final static String GCLOUD_EXE = "google-cloud-sdk/bin/gcloud";
-	private static final String HOST_PORT = "localhost:8128"; 
+	private static final String HOST_PORT = "localhost:8128";
+
+	private static final long EMULATOR_SPINUP_DELAY_MS = 30000L;
 
 	private final File sdkDir;
 	private ExecuteWatchdog watchdog;
@@ -58,30 +61,33 @@ public class BigtableEmulator
 				}
 			}
 			catch (IOException e) {
-				LOGGER.error(e.getMessage());
+				LOGGER.error(
+						e.getMessage());
 				return false;
 			}
 		}
-		
+
 		try {
 			startEmulator();
 		}
 		catch (IOException | InterruptedException e) {
-			LOGGER.error(e.getMessage());
+			LOGGER.error(
+					e.getMessage());
 			return false;
 		}
 
 		return true;
 	}
-	
+
 	public void stop() {
 		if (watchdog != null) {
 			watchdog.destroyProcess();
 		}
-		
-		LOGGER.warn("Bigtable emulator stopped");
+
+		LOGGER.warn(
+				"Bigtable emulator stopped");
 	}
-	
+
 	private boolean isInstalled() {
 		final File gcloudExe = new File(
 				sdkDir,
@@ -93,7 +99,7 @@ public class BigtableEmulator
 	protected boolean install()
 			throws IOException {
 		URL url = new URL(
-				GCLOUD_URL+GCLOUD_TAR);
+				GCLOUD_URL + GCLOUD_TAR);
 
 		final File downloadFile = new File(
 				sdkDir,
@@ -118,27 +124,34 @@ public class BigtableEmulator
 		unarchiver.setDestDirectory(
 				sdkDir);
 		unarchiver.extract();
-		
+
 		if (!downloadFile.delete()) {
 			LOGGER.warn(
 					"cannot delete " + downloadFile.getAbsolutePath());
 		}
-		
+
 		// Check the install
 		if (!isInstalled()) {
-			LOGGER.error("Gcloud install failed");
+			LOGGER.error(
+					"Gcloud install failed");
 			return false;
 		}
-		
+
 		// Install the beta components
-		CommandLine cmdLine = new CommandLine(sdkDir+"/"+GCLOUD_EXE);
-		cmdLine.addArgument("components");
-		cmdLine.addArgument("install");
-		cmdLine.addArgument("beta");
-		cmdLine.addArgument("--quiet");
+		CommandLine cmdLine = new CommandLine(
+				sdkDir + "/" + GCLOUD_EXE);
+		cmdLine.addArgument(
+				"components");
+		cmdLine.addArgument(
+				"install");
+		cmdLine.addArgument(
+				"beta");
+		cmdLine.addArgument(
+				"--quiet");
 		DefaultExecutor executor = new DefaultExecutor();
-		int exitValue = executor.execute(cmdLine);
-		
+		int exitValue = executor.execute(
+				cmdLine);
+
 		LOGGER.warn(
 				"KAM >>> gcloud install beta; exit code = " + exitValue);
 
@@ -152,27 +165,45 @@ public class BigtableEmulator
 	 * @return exitCode
 	 * @throws ExecuteException
 	 * @throws IOException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	private void startEmulator()
 			throws ExecuteException,
-			IOException, InterruptedException {
-		CommandLine cmdLine = new CommandLine(sdkDir+"/"+GCLOUD_EXE);
-		cmdLine.addArgument("beta");
-		cmdLine.addArgument("emulators");
-		cmdLine.addArgument("bigtable");
-		cmdLine.addArgument("start");
-		cmdLine.addArgument("--quiet");
-		cmdLine.addArgument("--host-port");
-		cmdLine.addArgument(HOST_PORT);
-		
+			IOException,
+			InterruptedException {
+		CommandLine cmdLine = new CommandLine(
+				sdkDir + "/" + GCLOUD_EXE);
+		cmdLine.addArgument(
+				"beta");
+		cmdLine.addArgument(
+				"emulators");
+		cmdLine.addArgument(
+				"bigtable");
+		cmdLine.addArgument(
+				"start");
+		cmdLine.addArgument(
+				"--quiet");
+		cmdLine.addArgument(
+				"--host-port");
+		cmdLine.addArgument(
+				HOST_PORT);
+
 		// Using a result handler makes the emulator run async
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
 		// watchdog shuts down the emulator, later
-		watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
+		watchdog = new ExecuteWatchdog(
+				ExecuteWatchdog.INFINITE_TIMEOUT);
 		Executor executor = new DefaultExecutor();
-		executor.setWatchdog(watchdog);
-		executor.execute(cmdLine, resultHandler);
+		executor.setWatchdog(
+				watchdog);
+		executor.execute(
+				cmdLine,
+				resultHandler);
+
+		// we need to wait here for a bit, in case the emulator needs to update
+		// itself
+		Thread.sleep(
+				EMULATOR_SPINUP_DELAY_MS);
 	}
 }
