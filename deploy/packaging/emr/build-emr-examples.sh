@@ -29,34 +29,51 @@ else
 fi
 TARGET_ROOT=${ARGS[workspace]}/deploy/packaging/emr/generated
 TEMPLATE_ROOT=${ARGS[workspace]}/deploy/packaging/emr/template
-mkdir -p $TARGET_ROOT
-cp $TEMPLATE_ROOT/geowave-install-lib.sh $TARGET_ROOT/geowave-install-lib.sh
+SLD_DIR=${ARGS[workspace]}/examples/example-slds
+
+mkdir -p $TARGET_ROOT/quickstart
 
 # temporarily cp templates to replace common tokens and then cp it to data store locations and rm it here 
 cp $TEMPLATE_ROOT/bootstrap-geowave.sh.template $TEMPLATE_ROOT/bootstrap-geowave.sh
 cp $TEMPLATE_ROOT/geowave-install-lib.sh.template $TEMPLATE_ROOT/geowave-install-lib.sh
-cp $TEMPLATE_ROOT/quickstart/geowave-env.sh.template $TEMPLATE_ROOT/quickstart/geowave-env.sh
+cp $TEMPLATE_ROOT/quickstart/geowave-env.sh.template $TARGET_ROOT/quickstart/geowave-env.sh
+
+# copy permanent resources that don't need a template
+cp $TEMPLATE_ROOT/quickstart/setup-geoserver-geowave-workspace.sh $TARGET_ROOT/quickstart/setup-geoserver-geowave-workspace.sh
+cp $SLD_DIR/*.sld $TARGET_ROOT/quickstart
 
 # replace version token first
 sed -i -e s/'$GEOWAVE_VERSION_TOKEN'/${ARGS[version]}/g $TEMPLATE_ROOT/bootstrap-geowave.sh
 sed -i -e s/'$GEOWAVE_VERSION_URL_TOKEN'/${GEOWAVE_VERSION_URL_TOKEN}/g $TEMPLATE_ROOT/bootstrap-geowave.sh
 sed -i -e s/'$GEOWAVE_REPO_RPM_TOKEN'/${GEOWAVE_REPO_RPM_TOKEN}/g $TEMPLATE_ROOT/bootstrap-geowave.sh
 
-sed -i -e s/'$GEOWAVE_REPO_BASE_URL_TOKEN'/${GEOWAVE_REPO_BASE_URL_TOKEN}/g $TEMPLATE_ROOT/geowave-install-lib.sh
+sed -i -e s~'$GEOWAVE_REPO_BASE_URL_TOKEN'~${GEOWAVE_REPO_BASE_URL_TOKEN}~g $TEMPLATE_ROOT/geowave-install-lib.sh
 sed -i -e s/'$GEOWAVE_REPO_NAME_TOKEN'/${GEOWAVE_REPO_NAME_TOKEN}/g $TEMPLATE_ROOT/geowave-install-lib.sh
 
-sed -i -e s/'$GEOWAVE_VERSION_TOKEN'/${ARGS[version]}/g $TEMPLATE_ROOT/quickstart/geowave-env.sh
+sed -i -e s/'$GEOWAVE_VERSION_TOKEN'/${ARGS[version]}/g $TARGET_ROOT/quickstart/geowave-env.sh
 
 for datastore in "${DATASTORES[@]}"
 do
-	mkdir -p $TARGET_ROOT/$datastore/
+	mkdir -p $TARGET_ROOT/quickstart/$datastore
+	mkdir -p $TARGET_ROOT/$datastore
 	cp $TEMPLATE_ROOT/bootstrap-geowave.sh $TARGET_ROOT/$datastore/bootstrap-geowave.sh
-	sed -e "s/DATASTORE_BOOTSTRAP_TOKEN/$(sed 's:/:\\/:g' $TEMPLATE_ROOT/$datastore/DATASTORE_BOOTSTRAP_TOKEN)/" $TARGET_ROOT/$datastore/bootstrap-geowave.sh
+	sed -e '/$DATASTORE_BOOTSTRAP_TOKEN/ {' -e 'r '$TEMPLATE_ROOT/$datastore/DATASTORE_BOOTSTRAP_TOKEN'' -e 'd' -e '}' -i $TARGET_ROOT/$datastore/bootstrap-geowave.sh
+	sed -i -e s/'$DATASTORE_TOKEN'/$datastore/g $TARGET_ROOT/$datastore/bootstrap-geowave.sh
+	
+	cp $TARGET_ROOT/$datastore/bootstrap-geowave.sh $TARGET_ROOT/quickstart/$datastore/bootstrap-geowave.sh
 	sed -i -e s/'$QUICKSTART_BOOTSTRAP_TOKEN'//g $TARGET_ROOT/$datastore/bootstrap-geowave.sh
-	cp $TEMPLATE_ROOT/bootstrap-geowave.sh $TARGET_ROOT/$datastore/geowave-install-lib.sh
-	cp $TEMPLATE_ROOT/bootstrap-geowave.sh $TARGET_ROOT/$datastore/quickstart/geowave-env.sh
+	sed -e '/$QUICKSTART_BOOTSTRAP_TOKEN/ {' -e 'r '$TEMPLATE_ROOT/quickstart/QUICKSTART_BOOTSTRAP_TOKEN'' -e 'd' -e '}' -i $TARGET_ROOT/quickstart/$datastore/bootstrap-geowave.sh
+	sed -i -e s/'$GEOWAVE_VERSION_URL_TOKEN'/$GEOWAVE_VERSION_URL_TOKEN/g $TARGET_ROOT/quickstart/$datastore/bootstrap-geowave.sh
+	sed -i -e s/'$DATASTORE_TOKEN'/$datastore/g $TARGET_ROOT/quickstart/$datastore/bootstrap-geowave.sh
+	
+	cp $TEMPLATE_ROOT/geowave-install-lib.sh $TARGET_ROOT/$datastore/geowave-install-lib.sh
+	sed -i -e s/'$DATASTORE_TOKEN'/${datastore}/g $TARGET_ROOT/$datastore/geowave-install-lib.sh
+	sed -e '/$DATASTORE_LIB_TOKEN/ {' -e 'r '$TEMPLATE_ROOT/$datastore/DATASTORE_LIB_TOKEN'' -e 'd' -e '}' -i $TARGET_ROOT/$datastore/geowave-install-lib.sh
+	
+	cp $TEMPLATE_ROOT/quickstart/ingest-and-kde-gdelt.sh.template $TARGET_ROOT/quickstart/$datastore/ingest-and-kde-gdelt.sh
+	sed -e '/$DATASTORE_PARAMS_TOKEN/ {' -e 'r '$TEMPLATE_ROOT/$datastore/DATASTORE_PARAMS_TOKEN'' -e 'd' -e '}' -i $TARGET_ROOT/quickstart/$datastore/ingest-and-kde-gdelt.sh
 done
+
 # clean up temporary templates
 rm $TEMPLATE_ROOT/bootstrap-geowave.sh
 rm $TEMPLATE_ROOT/geowave-install-lib.sh
-rm $TEMPLATE_ROOT/quickstart/geowave-env.sh
