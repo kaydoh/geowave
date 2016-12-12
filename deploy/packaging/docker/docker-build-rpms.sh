@@ -71,7 +71,7 @@ docker run --rm \
     -v $WORKSPACE:/usr/src/geowave \
     -v $LOCAL_REPO_DIR:/usr/src/repo \
     -v $LOCK_DIR:/usr/src/lock \
-    ngageoint/geowave-centos6-rpm-build \
+    ngageoint/geowave-centos6-publish \
     /bin/bash -c \
     "cd \$WORKSPACE && deploy/packaging/docker/publish/publish-common-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave"
 
@@ -113,7 +113,7 @@ do
     	-v $WORKSPACE:/usr/src/geowave \
     	-v $LOCAL_REPO_DIR:/usr/src/repo \
     	-v $LOCK_DIR:/usr/src/lock \
-    	ngageoint/geowave-centos6-rpm-build \
+    	ngageoint/geowave-centos6-publish \
     	/bin/bash -c \
     	"cd \$WORKSPACE && deploy/packaging/docker/publish/publish-vendor-rpm.sh --buildroot deploy/packaging/rpm/centos/6 --arch noarch --repo geowave"	
 done
