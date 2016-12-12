@@ -40,22 +40,22 @@ then
 	cp /usr/src/geowave/deploy/target/*${GEOWAVE_VERSION}.tar.gz .
 else
 	rm -f *.gz *.jar
-	if [[ ! -f ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-accumulo-to-hdfs.sh ]]; then
+	if [[ ! -f deploy-geowave-accumulo-to-hdfs.sh ]]; then
 		# Copy the template for accumulo to sources
-		cp ${WORKSPACE}/deploy/packaging/docker/build-rpm/deploy-geowave-to-hdfs.sh.template ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-accumulo-to-hdfs.sh
+		cp ${WORKSPACE}/deploy/packaging/docker/build-rpm/deploy-geowave-to-hdfs.sh.template deploy-geowave-accumulo-to-hdfs.sh
 	
 		# Replace the tokens appropriately for accumulo
-		sed -i -e s/'$DATASTORE_TOKEN'/accumulo/g ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-accumulo-to-hdfs.sh
-		sed -i -e s/'$DATASTORE_USER_TOKEN'/accumulo/g ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-accumulo-to-hdfs.sh
+		sed -i -e s/'$DATASTORE_TOKEN'/accumulo/g deploy-geowave-accumulo-to-hdfs.sh
+		sed -i -e s/'$DATASTORE_USER_TOKEN'/accumulo/g deploy-geowave-accumulo-to-hdfs.sh
 	fi
 
-	if [[ ! -f ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-hbase-to-hdfs.sh ]]; then
+	if [[ ! -f deploy-geowave-hbase-to-hdfs.sh ]]; then
 		# Copy the template for hbase to sources
-		cp ${WORKSPACE}/deploy/packaging/docker/build-rpm/deploy-geowave-to-hdfs.sh.template ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-hbase-to-hdfs.sh
+		cp ${WORKSPACE}/deploy/packaging/docker/build-rpm/deploy-geowave-to-hdfs.sh.template deploy-geowave-hbase-to-hdfs.sh
 	
 		# Replace the tokens appropriately for hbase
-		sed -i -e s/'$DATASTORE_TOKEN'/hbase/g ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-hbase-to-hdfs.sh
-		sed -i -e s/'$DATASTORE_USER_TOKEN'/hbase/g ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-hbase-to-hdfs.sh
+		sed -i -e s/'$DATASTORE_TOKEN'/hbase/g deploy-geowave-hbase-to-hdfs.sh
+		sed -i -e s/'$DATASTORE_USER_TOKEN'/hbase/g deploy-geowave-hbase-to-hdfs.sh
 	fi
 	cp /usr/src/geowave/deploy/target/*${GEOWAVE_VERSION}-${VENDOR_VERSION}.jar .
 	cp /usr/src/geowave/deploy/target/*${GEOWAVE_VERSION}-${VENDOR_VERSION}.tar.gz .
