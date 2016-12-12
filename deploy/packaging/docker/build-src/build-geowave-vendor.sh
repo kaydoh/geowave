@@ -44,7 +44,7 @@ $WORKSPACE/deploy/packaging/docker/build-src/install-jace.sh $BUILD_ARGS "$@"
 
 cd $WORKSPACE
 # Build the jace bindings
-if [[ ! -f $WORKSPACE/deploy/target/geowave-c++-${GEOWAVE_VERSION-${VENDOR_VERSION}.tar.gz ]]; then
+if [[ ! -f $WORKSPACE/deploy/target/geowave-c++-${GEOWAVE_VERSION}-${VENDOR_VERSION}.tar.gz ]]; then
 	rm -rf $WORKSPACE/deploy/target/dependency
 	mvn -o -q package -am -pl deploy -P generate-geowave-jace -Djace.finalName=geowave-runtime-${GEOWAVE_VERSION}-${VENDOR_VERSION} $BUILD_ARGS "$@"
     mv $WORKSPACE/deploy/target/geowave-runtime-${GEOWAVE_VERSION}-${VENDOR_VERSION}.jar $WORKSPACE/deploy/target/geowave-c++/bin/geowave-runtime-${GEOWAVE_VERSION}-${VENDOR_VERSION}.jar
