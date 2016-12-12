@@ -63,24 +63,6 @@ rm -rf geowave
 # Copy the Jace C++ artifacts
 cp ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/geowave-c++-${GEOWAVE_VERSION}-${VENDOR_VERSION}.tar.gz ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave-c++-${VENDOR_VERSION}-${GEOWAVE_VERSION}${TIME_TAG_STR}.tar.gz
 
-if [[ ! -f ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-accumulo-to-hdfs.sh ]]; then
-	# Copy the template for accumulo to sources
-	cp ${WORKSPACE}/deploy/packaging/docker/publish/deploy-geowave-to-hdfs.sh.template ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-accumulo-to-hdfs.sh
-	
-	# Replace the tokens appropriately for accumulo
-	sed -i -e s/'$DATASTORE_TOKEN'/accumulo/g ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-accumulo-to-hdfs.sh
-	sed -i -e s/'$DATASTORE_USER_TOKEN'/accumulo/g ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-accumulo-to-hdfs.sh
-fi
-
-if [[ ! -f ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-hbase-to-hdfs.sh ]]; then
-	# Copy the template for hbase to sources
-	cp ${WORKSPACE}/deploy/packaging/docker/publish/deploy-geowave-to-hdfs.sh.template ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-hbase-to-hdfs.sh
-	
-	# Replace the tokens appropriately for hbase
-	sed -i -e s/'$DATASTORE_TOKEN'/hbase/g ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-hbase-to-hdfs.sh
-	sed -i -e s/'$DATASTORE_USER_TOKEN'/hbase/g ${WORKSPACE}/${ARGS[buildroot]}/SOURCES/deploy-geowave-hbase-to-hdfs.sh
-fi
-
 echo '###### Copy rpm to repo and reindex'
 
 cp -R ${WORKSPACE}/${ARGS[buildroot]}/RPMS/${ARGS[arch]}/*.rpm ${LOCAL_REPO_DIR}/${ARGS[repo]}/${BUILD_TYPE}/${ARGS[arch]}/
