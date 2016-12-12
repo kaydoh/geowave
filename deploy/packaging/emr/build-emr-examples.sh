@@ -13,6 +13,7 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+
 if [[ "${ARGS[buildtype]}" = "dev" ]]
 then
 	#its a dev/latest build

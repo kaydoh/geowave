@@ -46,8 +46,8 @@ cd ${WORKSPACE}/${ARGS[buildroot]}/TARBALL/geowave
 # Extract all the files
 rpm2cpio *.rpm | cpio -idmv
 
-# Push our compiled docs to S3 if aws command has been installed
-if [[ command -v aws >/dev/null 2>&1 &&  ! -z "$GEOWAVE_VERSION_URL" ]]; then
+# Push our compiled docs and scripts to S3 if aws command has been installed and version url is defined
+if [[ 'command -v aws >/dev/null 2>&1' &&  ! -z "$GEOWAVE_VERSION_URL" ]]; then
 	echo '###### Cleaning and copying documentation to S3'
 	aws s3 rm --recursive ${WORKSPACE}/target/site/ s3://geowave/${GEOWAVE_VERSION_URL}/docs/
 	aws s3 cp --acl public-read --recursive ${WORKSPACE}/target/site/ s3://geowave/${GEOWAVE_VERSION_URL}/docs/
