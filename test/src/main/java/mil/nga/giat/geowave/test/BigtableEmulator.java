@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
@@ -11,7 +12,9 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.commons.io.IOUtils;
+import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,8 @@ public class BigtableEmulator
 
 	private final File sdkDir;
 	private ExecuteWatchdog watchdog;
+	private ShutdownHookProcessDestroyer processDestroyer;
+	private ArrayList<Process> processList;
 
 	public BigtableEmulator(
 			String sdkDir ) {
@@ -48,6 +53,8 @@ public class BigtableEmulator
 		if (!this.sdkDir.exists() && !this.sdkDir.mkdirs()) {
 			LOGGER.warn("unable to create directory " + this.sdkDir.getAbsolutePath());
 		}
+		
+		this.processList = new ArrayList<Process>();
 	}
 
 	public boolean start() {
@@ -75,10 +82,16 @@ public class BigtableEmulator
 	}
 
 	public void stop() {
+		// Stop the emulator
 		if (watchdog != null) {
 			watchdog.destroyProcess();
 		}
-
+		
+		// kill the children the hard way
+		for (Process process : processList) {
+			process.destroyForcibly();
+		}
+		
 		LOGGER.warn("Bigtable emulator stopped");
 	}
 
@@ -175,6 +188,16 @@ public class BigtableEmulator
 		executor.execute(
 				cmdLine,
 				resultHandler);
+		
+		processList.clear();
+		processDestroyer = new ShutdownHookProcessDestroyer() {
+			@Override
+			public boolean add(final Process process) {
+				processList.add(process);
+				return super.add(process);
+			}
+		};	
+		executor.setProcessDestroyer(processDestroyer);
 
 		// we need to wait here for a bit, in case the emulator needs to update
 		// itself
