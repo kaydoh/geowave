@@ -12,9 +12,8 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
-import org.apache.commons.exec.ShutdownHookProcessDestroyer;
+import org.apache.commons.exec.ProcessDestroyer;
 import org.apache.commons.io.IOUtils;
-import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ public class BigtableEmulator
 
 	private final File sdkDir;
 	private ExecuteWatchdog watchdog;
-	private ShutdownHookProcessDestroyer processDestroyer;
+	private ProcessDestroyer processDestroyer;
 	private ArrayList<Process> processList;
 
 	public BigtableEmulator(
@@ -89,7 +88,7 @@ public class BigtableEmulator
 		
 		// kill the children the hard way
 		for (Process process : processList) {
-			process.destroyForcibly();
+			processDestroyer.remove(process);
 		}
 		
 		LOGGER.warn("Bigtable emulator stopped");
@@ -190,11 +189,22 @@ public class BigtableEmulator
 				resultHandler);
 		
 		processList.clear();
-		processDestroyer = new ShutdownHookProcessDestroyer() {
+		processDestroyer = new ProcessDestroyer() {
 			@Override
-			public boolean add(final Process process) {
-				processList.add(process);
-				return super.add(process);
+			public boolean add(final Process process) {		
+				return processList.add(process);
+			}
+
+			@Override
+			public boolean remove(
+					Process process ) {
+				process.destroyForcibly();
+				return processList.remove(process);
+			}
+
+			@Override
+			public int size() {
+				return processList.size();
 			}
 		};	
 		executor.setProcessDestroyer(processDestroyer);
