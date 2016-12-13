@@ -51,7 +51,7 @@ public class GeoWaveGTDataStoreFactory implements
 	}
 
 	private static Map<String, Set<StoreFactoryFamilySpi>> argumentSupersetStores;
-	private static final Object lock = new Object();
+	private static final Object LOCK = new Object();
 
 	public final static String DISPLAY_NAME_PREFIX = "GeoWave Datastore - ";
 	private static final Logger LOGGER = Logger.getLogger(GeoWaveGTDataStoreFactory.class);
@@ -69,7 +69,7 @@ public class GeoWaveGTDataStoreFactory implements
 				.getRegisteredStoreFactoryFamilies()
 				.values();
 
-		synchronized (lock) {
+		synchronized (LOCK) {
 			if (argumentSupersetStores == null) {
 				// initialize arguments map
 				argumentSupersetStores = new HashMap<String, Set<StoreFactoryFamilySpi>>();
@@ -220,6 +220,12 @@ public class GeoWaveGTDataStoreFactory implements
 	@Override
 	public boolean canProcess(
 			final Map<String, Serializable> params ) {
+		final ConfigOption[] requiredOptions = GeoWaveStoreFinder.getRequiredOptions(geowaveStoreFactoryFamily);
+		for (ConfigOption requiredOption : requiredOptions) {
+			if (!params.containsKey(requiredOption.getName())) {
+				return false;
+			}
+		}
 		try {
 			// rely on validation in GeoWavePluginConfig's constructor
 			new GeoWavePluginConfig(

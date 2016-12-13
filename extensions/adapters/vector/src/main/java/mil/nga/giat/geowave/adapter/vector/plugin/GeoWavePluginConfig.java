@@ -224,30 +224,22 @@ public class GeoWavePluginConfig
 				break;
 			}
 		}
-
+		StoreFactoryOptions options = ConfigUtils.populateOptionsFromList(
+				storeFactoryFamily.getAdapterStoreFactory().createOptionsInstance(),
+				paramStrs);
 		adapterStore = storeFactoryFamily.getAdapterStoreFactory().createStore(
-				ConfigUtils.populateOptionsFromList(
-						storeFactoryFamily.getAdapterStoreFactory().createOptionsInstance(),
-						paramStrs));
+				options);
 
 		dataStore = storeFactoryFamily.getDataStoreFactory().createStore(
-				ConfigUtils.populateOptionsFromList(
-						storeFactoryFamily.getDataStoreFactory().createOptionsInstance(),
-						paramStrs));
+				options);
 
 		dataStatisticsStore = storeFactoryFamily.getDataStatisticsStoreFactory().createStore(
-				ConfigUtils.populateOptionsFromList(
-						storeFactoryFamily.getDataStatisticsStoreFactory().createOptionsInstance(),
-						paramStrs));
+				options);
 
 		indexStore = storeFactoryFamily.getIndexStoreFactory().createStore(
-				ConfigUtils.populateOptionsFromList(
-						storeFactoryFamily.getIndexStoreFactory().createOptionsInstance(),
-						paramStrs));
+				options);
 		adapterIndexMappingStore = storeFactoryFamily.getAdapterIndexMappingStoreFactory().createStore(
-				ConfigUtils.populateOptionsFromList(
-						storeFactoryFamily.getAdapterIndexMappingStoreFactory().createOptionsInstance(),
-						paramStrs));
+				options);
 		lockingManagementFactory = factory;
 
 		authorizationFactory = getAuthorizationFactory(params);
