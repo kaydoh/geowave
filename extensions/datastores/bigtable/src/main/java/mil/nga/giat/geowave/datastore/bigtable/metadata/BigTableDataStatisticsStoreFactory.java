@@ -19,7 +19,6 @@ public class BigTableDataStatisticsStoreFactory extends
 		}
 		final BigTableOptions opts = (BigTableOptions) options;
 		return new HBaseDataStatisticsStore(
-				createOperations(
-						opts));
+				createOperations(opts));
 	}
 }

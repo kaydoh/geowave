@@ -84,32 +84,39 @@ public class BigtableEmulator
 		File bashFile = new File(
 				TestUtils.TEMP_DIR,
 				"kill-bigtable.sh");
-		
+
 		PrintWriter scriptWriter;
 		try {
-			scriptWriter = new PrintWriter(bashFile);
+			scriptWriter = new PrintWriter(
+					bashFile);
+			scriptWriter.println("#!/bin/bash");
 			scriptWriter.println(KILL_CMD_1);
 			scriptWriter.println(KILL_CMD_2);
 			scriptWriter.close();
-			
+
 			bashFile.setExecutable(true);
 		}
 		catch (FileNotFoundException e1) {
-			LOGGER.error("Unable to create bigtable emulator kill script", e1);
+			LOGGER.error(
+					"Unable to create bigtable emulator kill script",
+					e1);
 			return;
 		}
 
-		CommandLine cmdLine = new CommandLine(bashFile.getAbsolutePath());
+		CommandLine cmdLine = new CommandLine(
+				bashFile.getAbsolutePath());
 		DefaultExecutor executor = new DefaultExecutor();
 		int exitValue = 0;
-		
+
 		try {
 			exitValue = executor.execute(cmdLine);
 		}
 		catch (IOException ex) {
-			LOGGER.error("Unable to execute bigtable emulator kill script", ex);
+			LOGGER.error(
+					"Unable to execute bigtable emulator kill script",
+					ex);
 		}
-		
+
 		LOGGER.warn("Bigtable emulator " + (exitValue == 0 ? "stopped" : "failed to stop"));
 	}
 
@@ -206,7 +213,7 @@ public class BigtableEmulator
 		executor.execute(
 				cmdLine,
 				resultHandler);
-		
+
 		// we need to wait here for a bit, in case the emulator needs to update
 		// itself
 		Thread.sleep(EMULATOR_SPINUP_DELAY_MS);

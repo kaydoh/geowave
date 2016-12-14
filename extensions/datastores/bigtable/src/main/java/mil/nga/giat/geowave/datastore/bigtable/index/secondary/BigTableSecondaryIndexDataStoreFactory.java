@@ -18,8 +18,7 @@ public class BigTableSecondaryIndexDataStoreFactory extends
 					"Expected " + BigTableOptions.class.getSimpleName());
 		}
 
-		final BigTableOperations bigTableOperations = createOperations(
-				(BigTableOptions) options);
+		final BigTableOperations bigTableOperations = createOperations((BigTableOptions) options);
 		return new HBaseSecondaryIndexDataStore(
 				bigTableOperations,
 				((BigTableOptions) options).getHBaseOptions());

@@ -19,8 +19,7 @@ public class BigTableIndexStoreFactory extends
 		}
 		final BigTableOptions opts = (BigTableOptions) options;
 		return new HBaseIndexStore(
-				createOperations(
-						opts));
+				createOperations(opts));
 	}
 
 }

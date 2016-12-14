@@ -18,8 +18,7 @@ public class BigTableAdapterIndexMappingStoreFactory extends
 					"Expected " + BigTableOptions.class.getSimpleName());
 		}
 
-		final BigTableOperations bigTableOperations = createOperations(
-				(BigTableOptions) options);
+		final BigTableOperations bigTableOperations = createOperations((BigTableOptions) options);
 		return new HBaseAdapterIndexMappingStore(
 				bigTableOperations);
 	}
