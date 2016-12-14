@@ -1,8 +1,10 @@
 package mil.nga.giat.geowave.test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 
 import org.apache.commons.exec.CommandLine;
@@ -78,24 +80,53 @@ public class BigtableEmulator
 		// kill all the emulator processes like this:
 		// ps -ef | grep "[g]cloud beta"  | awk '{print $2}' | xargs pgrep -g | xargs kill -9
 
-		CommandLine cmdLine = new CommandLine("ps -ef");
+		/*
+		CommandLine cmdLine = new CommandLine("/bin/sh");
+		cmdLine.addArgument("ps -ef");
+		cmdLine.addArgument("-ef");
 		cmdLine.addArgument("|");
-		cmdLine.addArgument("grep \"[g]cloud beta\"");
+		cmdLine.addArgument("grep");
+		cmdLine.addArgument("\"[g]cloud beta\"", false);
 		cmdLine.addArgument("|");
-		cmdLine.addArgument("awk '{print $2}'");
+		cmdLine.addArgument("awk");
+		cmdLine.addArgument("'{print $2}'", false);
 		cmdLine.addArgument("|");
-		cmdLine.addArgument("xargs pgrep -g");
+		cmdLine.addArgument("xargs");
+		cmdLine.addArgument("pgrep");
+		cmdLine.addArgument("-g");
 		cmdLine.addArgument("|");
-		cmdLine.addArgument("xargs kill -9");
+		cmdLine.addArgument("xargs");
+		cmdLine.addArgument("kill");
+		cmdLine.addArgument("-9");
+		*/
+		// Or, just run this as a script:
+		final String KILL_CMD = "for i in $(ps -ef | grep -i \"[b]igtable\" | awk '{print $2}'); do kill -9 $i; done";
+		File bashFile = new File(
+				TestUtils.TEMP_DIR,
+				"kill-bigtable.sh");
+		
+		PrintWriter scriptWriter;
+		try {
+			scriptWriter = new PrintWriter(bashFile);
+			scriptWriter.println(KILL_CMD);
+			scriptWriter.close();
+			
+			bashFile.setExecutable(true);
+		}
+		catch (FileNotFoundException e1) {
+			LOGGER.error("Unable to create bigtable emulator kill script", e1);
+			return;
+		}
+
+		CommandLine cmdLine = new CommandLine(bashFile.getAbsolutePath());
 		DefaultExecutor executor = new DefaultExecutor();
 		int exitValue = 0;
 		
 		try {
 			exitValue = executor.execute(cmdLine);
 		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		catch (IOException ex) {
+			LOGGER.error("Unable to execute bigtable emulator kill script", ex);
 		}
 		
 		LOGGER.warn("Bigtable emulator " + (exitValue == 0 ? "stopped" : "failed to stop"));
