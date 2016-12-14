@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
@@ -12,7 +11,6 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
-import org.apache.commons.exec.ProcessDestroyer;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -34,8 +32,6 @@ public class BigtableEmulator
 
 	private final File sdkDir;
 	private ExecuteWatchdog watchdog;
-	private ProcessDestroyer processDestroyer;
-	private ArrayList<Process> processList;
 
 	public BigtableEmulator(
 			String sdkDir ) {
@@ -52,8 +48,6 @@ public class BigtableEmulator
 		if (!this.sdkDir.exists() && !this.sdkDir.mkdirs()) {
 			LOGGER.warn("unable to create directory " + this.sdkDir.getAbsolutePath());
 		}
-		
-		this.processList = new ArrayList<Process>();
 	}
 
 	public boolean start() {
@@ -81,17 +75,30 @@ public class BigtableEmulator
 	}
 
 	public void stop() {
-		// Stop the emulator
-		if (watchdog != null) {
-			watchdog.destroyProcess();
+		// kill all the emulator processes like this:
+		// ps -ef | grep "[g]cloud beta"  | awk '{print $2}' | xargs pgrep -g | xargs kill -9
+
+		CommandLine cmdLine = new CommandLine("ps -ef");
+		cmdLine.addArgument("|");
+		cmdLine.addArgument("grep \"[g]cloud beta\"");
+		cmdLine.addArgument("|");
+		cmdLine.addArgument("awk '{print $2}'");
+		cmdLine.addArgument("|");
+		cmdLine.addArgument("xargs pgrep -g");
+		cmdLine.addArgument("|");
+		cmdLine.addArgument("xargs kill -9");
+		DefaultExecutor executor = new DefaultExecutor();
+		int exitValue = 0;
+		
+		try {
+			exitValue = executor.execute(cmdLine);
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
-		// kill the children the hard way
-		for (Process process : processList) {
-			processDestroyer.remove(process);
-		}
-		
-		LOGGER.warn("Bigtable emulator stopped");
+		LOGGER.warn("Bigtable emulator " + (exitValue == 0 ? "stopped" : "failed to stop"));
 	}
 
 	private boolean isInstalled() {
@@ -188,27 +195,6 @@ public class BigtableEmulator
 				cmdLine,
 				resultHandler);
 		
-		processList.clear();
-		processDestroyer = new ProcessDestroyer() {
-			@Override
-			public boolean add(final Process process) {		
-				return processList.add(process);
-			}
-
-			@Override
-			public boolean remove(
-					Process process ) {
-				process.destroyForcibly();
-				return processList.remove(process);
-			}
-
-			@Override
-			public int size() {
-				return processList.size();
-			}
-		};	
-		executor.setProcessDestroyer(processDestroyer);
-
 		// we need to wait here for a bit, in case the emulator needs to update
 		// itself
 		Thread.sleep(EMULATOR_SPINUP_DELAY_MS);
