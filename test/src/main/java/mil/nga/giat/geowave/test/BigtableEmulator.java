@@ -78,29 +78,9 @@ public class BigtableEmulator
 
 	public void stop() {
 		// kill all the emulator processes like this:
-		// ps -ef | grep "[g]cloud beta"  | awk '{print $2}' | xargs pgrep -g | xargs kill -9
+		final String KILL_CMD_1 = "for i in $(ps -ef | grep -i \"[b]eta emulators bigtable\" | awk '{print $2}'); do kill -9 $i; done";
+		final String KILL_CMD_2 = "for i in $(ps -ef | grep -i \"[c]btemulator\" | awk '{print $2}'); do kill -9 $i; done";
 
-		/*
-		CommandLine cmdLine = new CommandLine("/bin/sh");
-		cmdLine.addArgument("ps -ef");
-		cmdLine.addArgument("-ef");
-		cmdLine.addArgument("|");
-		cmdLine.addArgument("grep");
-		cmdLine.addArgument("\"[g]cloud beta\"", false);
-		cmdLine.addArgument("|");
-		cmdLine.addArgument("awk");
-		cmdLine.addArgument("'{print $2}'", false);
-		cmdLine.addArgument("|");
-		cmdLine.addArgument("xargs");
-		cmdLine.addArgument("pgrep");
-		cmdLine.addArgument("-g");
-		cmdLine.addArgument("|");
-		cmdLine.addArgument("xargs");
-		cmdLine.addArgument("kill");
-		cmdLine.addArgument("-9");
-		*/
-		// Or, just run this as a script:
-		final String KILL_CMD = "for i in $(ps -ef | grep -i \"[b]igtable\" | awk '{print $2}'); do kill -9 $i; done";
 		File bashFile = new File(
 				TestUtils.TEMP_DIR,
 				"kill-bigtable.sh");
@@ -108,7 +88,8 @@ public class BigtableEmulator
 		PrintWriter scriptWriter;
 		try {
 			scriptWriter = new PrintWriter(bashFile);
-			scriptWriter.println(KILL_CMD);
+			scriptWriter.println(KILL_CMD_1);
+			scriptWriter.println(KILL_CMD_2);
 			scriptWriter.close();
 			
 			bashFile.setExecutable(true);
